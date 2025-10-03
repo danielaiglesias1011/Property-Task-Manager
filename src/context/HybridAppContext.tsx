@@ -445,27 +445,27 @@ export const HybridAppProvider: React.FC<{ children: ReactNode }> = ({ children 
         // Set default statuses if database doesn't have them
         const defaultStatuses = [
           // Project statuses
-          { id: '1', name: 'Draft', type: 'project', color: '#6B7280', isDefault: true, createdAt: new Date() },
-          { id: '2', name: 'Pending', type: 'project', color: '#6B7280', isDefault: true, createdAt: new Date() },
-          { id: '3', name: 'Pending Approval', type: 'project', color: '#F59E0B', isDefault: true, createdAt: new Date() },
-          { id: '4', name: 'Approved', type: 'project', color: '#10B981', isDefault: true, createdAt: new Date() },
-          { id: '5', name: 'Planning', type: 'project', color: '#F59E0B', isDefault: true, createdAt: new Date() },
-          { id: '6', name: 'In Progress', type: 'project', color: '#3B82F6', isDefault: true, createdAt: new Date() },
-          { id: '7', name: 'Completed', type: 'project', color: '#10B981', isDefault: true, createdAt: new Date() },
-          { id: '8', name: 'On Hold', type: 'project', color: '#F97316', isDefault: true, createdAt: new Date() },
-          { id: '9', name: 'Rejected', type: 'project', color: '#EF4444', isDefault: true, createdAt: new Date() },
+          { id: '1', name: 'Draft', type: 'project' as 'project' | 'task', color: '#6B7280', isDefault: true, createdAt: new Date() },
+          { id: '2', name: 'Pending', type: 'project' as 'project' | 'task', color: '#6B7280', isDefault: true, createdAt: new Date() },
+          { id: '3', name: 'Pending Approval', type: 'project' as 'project' | 'task', color: '#F59E0B', isDefault: true, createdAt: new Date() },
+          { id: '4', name: 'Approved', type: 'project' as 'project' | 'task', color: '#10B981', isDefault: true, createdAt: new Date() },
+          { id: '5', name: 'Planning', type: 'project' as 'project' | 'task', color: '#F59E0B', isDefault: true, createdAt: new Date() },
+          { id: '6', name: 'In Progress', type: 'project' as 'project' | 'task', color: '#3B82F6', isDefault: true, createdAt: new Date() },
+          { id: '7', name: 'Completed', type: 'project' as 'project' | 'task', color: '#10B981', isDefault: true, createdAt: new Date() },
+          { id: '8', name: 'On Hold', type: 'project' as 'project' | 'task', color: '#F97316', isDefault: true, createdAt: new Date() },
+          { id: '9', name: 'Rejected', type: 'project' as 'project' | 'task', color: '#EF4444', isDefault: true, createdAt: new Date() },
           // Task statuses
-          { id: '10', name: 'Pending', type: 'task', color: '#6B7280', isDefault: true, createdAt: new Date() },
-          { id: '11', name: 'In Progress', type: 'task', color: '#3B82F6', isDefault: true, createdAt: new Date() },
-          { id: '12', name: 'Completed', type: 'task', color: '#10B981', isDefault: true, createdAt: new Date() },
-          { id: '13', name: 'Cancelled', type: 'task', color: '#EF4444', isDefault: true, createdAt: new Date() }
+          { id: '10', name: 'Pending', type: 'task' as 'project' | 'task', color: '#6B7280', isDefault: true, createdAt: new Date() },
+          { id: '11', name: 'In Progress', type: 'task' as 'project' | 'task', color: '#3B82F6', isDefault: true, createdAt: new Date() },
+          { id: '12', name: 'Completed', type: 'task' as 'project' | 'task', color: '#10B981', isDefault: true, createdAt: new Date() },
+          { id: '13', name: 'Cancelled', type: 'task' as 'project' | 'task', color: '#EF4444', isDefault: true, createdAt: new Date() }
         ];
         dispatch({ type: 'SET_STATUSES', payload: defaultStatuses });
       } else {
         const statuses = statusesData?.map((row: any) => ({
           id: row.id || '',
           name: row.name || '',
-          type: row.type || 'project',
+          type: (row.type || 'project') as 'project' | 'task',
           color: row.color || '#6B7280',
           isDefault: row.is_default || false,
           createdAt: row.created_at ? new Date(row.created_at) : new Date()
