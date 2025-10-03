@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { AppProvider, useApp } from './context/AppContext';
+import { HybridAppProvider, useApp } from './context/HybridAppContext';
 import { ThemeProvider } from './context/ThemeContext';
 import Layout from './components/Layout/Layout';
 import Dashboard from './pages/Dashboard';
@@ -27,6 +27,21 @@ const AppContent: React.FC = () => {
       });
     }
   }, [state.users, state.currentUser, dispatch]);
+
+  // Show loading screen while data is being fetched
+  if (state.loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading Property Task Manager...</p>
+          {state.error && (
+            <p className="text-red-600 mt-2">Error: {state.error}</p>
+          )}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <Router>
@@ -57,9 +72,9 @@ const App: React.FC = () => {
   return (
     <ErrorBoundary>
       <ThemeProvider>
-        <AppProvider>
+        <HybridAppProvider>
           <AppContent />
-        </AppProvider>
+        </HybridAppProvider>
       </ThemeProvider>
     </ErrorBoundary>
   );
