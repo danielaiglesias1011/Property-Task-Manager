@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { SupabaseAppProvider, useApp } from './context/SupabaseAppContext';
+import { AppProvider, useApp } from './context/AppContext';
 import { ThemeProvider } from './context/ThemeContext';
 import Layout from './components/Layout/Layout';
 import Dashboard from './pages/Dashboard';
@@ -23,53 +23,10 @@ const AppContent: React.FC = () => {
     if (state.users.length > 0 && !state.currentUser) {
       dispatch({
         type: 'SET_CURRENT_USER',
-        payload: state.users[0] // Use the first user from Supabase
+        payload: state.users[0]
       });
     }
   }, [state.users, state.currentUser, dispatch]);
-
-  // Debug info
-  console.log('App state:', {
-    loading: state.loading,
-    users: state.users.length,
-    properties: state.properties.length,
-    projects: state.projects.length,
-    error: state.error
-  });
-
-  // Show loading screen while data is being fetched
-  if (state.loading && state.users.length === 0) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading Property Task Manager...</p>
-          {state.error && (
-            <p className="text-red-600 mt-2">Error: {state.error}</p>
-          )}
-        </div>
-      </div>
-    );
-  }
-
-  // Show error screen if there's an error
-  if (state.error) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-red-600 mb-4">Connection Error</h1>
-          <p className="text-gray-600 mb-4">Unable to connect to the database.</p>
-          <p className="text-sm text-gray-500 mb-4">Error: {state.error}</p>
-          <button
-            onClick={() => window.location.reload()}
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-          >
-            Retry
-          </button>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <Router>
@@ -100,9 +57,9 @@ const App: React.FC = () => {
   return (
     <ErrorBoundary>
       <ThemeProvider>
-        <SupabaseAppProvider>
+        <AppProvider>
           <AppContent />
-        </SupabaseAppProvider>
+        </AppProvider>
       </ThemeProvider>
     </ErrorBoundary>
   );
