@@ -409,6 +409,97 @@ export const HybridAppProvider: React.FC<{ children: ReactNode }> = ({ children 
         dispatch({ type: 'SET_ATTACHMENT_TYPES', payload: attachmentTypes });
       }
 
+      // Load priorities
+      const { data: prioritiesData, error: prioritiesError } = await supabase
+        .from('priorities')
+        .select('*');
+      
+      if (prioritiesError) {
+        console.warn('Could not load priorities:', prioritiesError);
+        // Set default priorities if database doesn't have them
+        const defaultPriorities = [
+          { id: '1', name: 'Low', level: 1, color: '#10B981', isDefault: true, createdAt: new Date() },
+          { id: '2', name: 'Medium', level: 2, color: '#F59E0B', isDefault: true, createdAt: new Date() },
+          { id: '3', name: 'High', level: 3, color: '#EF4444', isDefault: true, createdAt: new Date() }
+        ];
+        dispatch({ type: 'SET_PRIORITIES', payload: defaultPriorities });
+      } else {
+        const priorities = prioritiesData?.map((row: any) => ({
+          id: row.id || '',
+          name: row.name || '',
+          level: row.level || 1,
+          color: row.color || '#6B7280',
+          isDefault: row.is_default || false,
+          createdAt: row.created_at ? new Date(row.created_at) : new Date()
+        })) || [];
+        dispatch({ type: 'SET_PRIORITIES', payload: priorities });
+      }
+
+      // Load statuses
+      const { data: statusesData, error: statusesError } = await supabase
+        .from('statuses')
+        .select('*');
+      
+      if (statusesError) {
+        console.warn('Could not load statuses:', statusesError);
+        // Set default statuses if database doesn't have them
+        const defaultStatuses = [
+          // Project statuses
+          { id: '1', name: 'Draft', type: 'project', color: '#6B7280', isDefault: true, createdAt: new Date() },
+          { id: '2', name: 'Pending', type: 'project', color: '#6B7280', isDefault: true, createdAt: new Date() },
+          { id: '3', name: 'Pending Approval', type: 'project', color: '#F59E0B', isDefault: true, createdAt: new Date() },
+          { id: '4', name: 'Approved', type: 'project', color: '#10B981', isDefault: true, createdAt: new Date() },
+          { id: '5', name: 'Planning', type: 'project', color: '#F59E0B', isDefault: true, createdAt: new Date() },
+          { id: '6', name: 'In Progress', type: 'project', color: '#3B82F6', isDefault: true, createdAt: new Date() },
+          { id: '7', name: 'Completed', type: 'project', color: '#10B981', isDefault: true, createdAt: new Date() },
+          { id: '8', name: 'On Hold', type: 'project', color: '#F97316', isDefault: true, createdAt: new Date() },
+          { id: '9', name: 'Rejected', type: 'project', color: '#EF4444', isDefault: true, createdAt: new Date() },
+          // Task statuses
+          { id: '10', name: 'Pending', type: 'task', color: '#6B7280', isDefault: true, createdAt: new Date() },
+          { id: '11', name: 'In Progress', type: 'task', color: '#3B82F6', isDefault: true, createdAt: new Date() },
+          { id: '12', name: 'Completed', type: 'task', color: '#10B981', isDefault: true, createdAt: new Date() },
+          { id: '13', name: 'Cancelled', type: 'task', color: '#EF4444', isDefault: true, createdAt: new Date() }
+        ];
+        dispatch({ type: 'SET_STATUSES', payload: defaultStatuses });
+      } else {
+        const statuses = statusesData?.map((row: any) => ({
+          id: row.id || '',
+          name: row.name || '',
+          type: row.type || 'project',
+          color: row.color || '#6B7280',
+          isDefault: row.is_default || false,
+          createdAt: row.created_at ? new Date(row.created_at) : new Date()
+        })) || [];
+        dispatch({ type: 'SET_STATUSES', payload: statuses });
+      }
+
+      // Load approval groups
+      const { data: approvalGroupsData, error: approvalGroupsError } = await supabase
+        .from('approval_groups')
+        .select('*');
+      
+      if (approvalGroupsError) {
+        console.warn('Could not load approval groups:', approvalGroupsError);
+        // Set default approval groups if database doesn't have them
+        const defaultApprovalGroups = [
+          { id: '1', name: 'Level 1 Approvers', level: 1, userIds: [], description: 'Basic level approval group', createdAt: new Date(), updatedAt: new Date() },
+          { id: '2', name: 'Level 2 Approvers', level: 2, userIds: [], description: 'Management level approval group', createdAt: new Date(), updatedAt: new Date() },
+          { id: '3', name: 'Level 3 Approvers', level: 3, userIds: [], description: 'Executive level approval group', createdAt: new Date(), updatedAt: new Date() }
+        ];
+        dispatch({ type: 'SET_APPROVAL_GROUPS', payload: defaultApprovalGroups });
+      } else {
+        const approvalGroups = approvalGroupsData?.map((row: any) => ({
+          id: row.id || '',
+          name: row.name || '',
+          level: row.level || 1,
+          userIds: row.user_ids || [],
+          description: row.description || '',
+          createdAt: row.created_at ? new Date(row.created_at) : new Date(),
+          updatedAt: row.updated_at ? new Date(row.updated_at) : new Date()
+        })) || [];
+        dispatch({ type: 'SET_APPROVAL_GROUPS', payload: approvalGroups });
+      }
+
       // Set default user if we have users and no current user
       if (users.length > 0 && !state.currentUser) {
         dispatch({ type: 'SET_CURRENT_USER', payload: users[0] });
@@ -418,7 +509,12 @@ export const HybridAppProvider: React.FC<{ children: ReactNode }> = ({ children 
         users: users.length,
         properties: properties.length,
         projects: projects.length,
-        tasks: tasks.length
+        tasks: tasks.length,
+        categories: state.projectCategories?.length || 0,
+        priorities: state.priorities?.length || 0,
+        statuses: state.statuses?.length || 0,
+        attachmentTypes: state.attachmentTypes?.length || 0,
+        approvalGroups: state.approvalGroups?.length || 0
       });
 
     } catch (error) {
