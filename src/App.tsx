@@ -8,7 +8,7 @@ import Properties from './pages/Properties';
 import Projects from './pages/Projects';
 import Tasks from './pages/Tasks';
 import Settings from './pages/Settings';
-import ForecastView from './components/Forecast/ForecastViewSimple';
+import ForecastView from './components/Forecast/ForecastView';
 import ApprovalsView from './components/Approvals/ApprovalsView';
 import './App.css';
 
