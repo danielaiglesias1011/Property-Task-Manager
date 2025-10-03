@@ -19,6 +19,7 @@ type AppAction =
   | { type: 'SET_TASKS'; payload: Task[] }
   | { type: 'ADD_TASK'; payload: Task }
   | { type: 'UPDATE_TASK'; payload: Task }
+  | { type: 'DELETE_TASK'; payload: string }
   | { type: 'SET_ATTACHMENT_TYPES'; payload: AttachmentType[] }
   | { type: 'ADD_ATTACHMENT_TYPE'; payload: AttachmentType }
   | { type: 'UPDATE_ATTACHMENT_TYPE'; payload: AttachmentType }
@@ -184,6 +185,11 @@ const appReducer = (state: AppState & { loading: boolean; error: string | null }
         tasks: state.tasks.map(task => 
           task.id === action.payload.id ? action.payload : task
         )
+      };
+    case 'DELETE_TASK':
+      return { 
+        ...state, 
+        tasks: state.tasks.filter(task => task.id !== action.payload)
       };
     case 'SET_ATTACHMENT_TYPES':
       return { ...state, attachmentTypes: action.payload };

@@ -3,9 +3,12 @@ import { useApp } from '../context/HybridAppContext';
 import { CheckSquare, Plus, Filter, ChevronDown, ChevronRight } from 'lucide-react';
 import TaskCard from '../components/Tasks/TaskCard';
 import CreateTaskModal from '../components/Tasks/CreateTaskModal';
+import { useModal } from '../hooks/useModal';
+import { ConfirmModal } from '../components/Common/ConfirmModal';
 
 const Tasks: React.FC = () => {
-  const { state } = useApp();
+  const { state, dispatch } = useApp();
+  const { showConfirm } = useModal();
   const [showCreateTask, setShowCreateTask] = useState(false);
   const [filterProperty, setFilterProperty] = useState<string>('');
   const [filterStatus, setFilterStatus] = useState<string>('');
@@ -29,6 +32,21 @@ const Tasks: React.FC = () => {
       ...prev,
       [sectionId]: !prev[sectionId]
     }));
+  };
+
+  const handleDeleteTask = (task: any) => {
+    showConfirm(
+      'Delete Task',
+      `Are you sure you want to delete the task "${task.name}"? This action cannot be undone.`,
+      () => {
+        dispatch({ type: 'DELETE_TASK', payload: task.id });
+      },
+      {
+        confirmText: 'Delete',
+        cancelText: 'Cancel',
+        type: 'danger'
+      }
+    );
   };
   
   // Task statistics
@@ -232,7 +250,7 @@ const Tasks: React.FC = () => {
                     {!isCollapsed && (
                       <div className="px-6 pb-6 space-y-1">
                         {tasks.map(task => (
-                          <TaskCard key={task.id} task={task} />
+                          <TaskCard key={task.id} task={task} onDelete={handleDeleteTask} />
                         ))}
                       </div>
                     )}
@@ -281,7 +299,7 @@ const Tasks: React.FC = () => {
                     {!isCollapsed && (
                       <div className="px-6 pb-6 space-y-1">
                         {projectTasks.map(task => (
-                          <TaskCard key={task.id} task={task} />
+                          <TaskCard key={task.id} task={task} onDelete={handleDeleteTask} />
                         ))}
                       </div>
                     )}
@@ -320,6 +338,9 @@ const Tasks: React.FC = () => {
           onClose={() => setShowCreateTask(false)}
         />
       )}
+
+      {/* Confirm Modal */}
+      <ConfirmModal />
     </div>
   );
 };

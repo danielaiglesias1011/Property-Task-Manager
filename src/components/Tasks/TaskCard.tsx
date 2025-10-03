@@ -8,6 +8,8 @@ import {
   MessageCircle,
   Paperclip,
   Edit2,
+  Trash2,
+  MoreVertical,
   ChevronDown,
   ChevronRight,
   Eye
@@ -17,14 +19,17 @@ import EditTaskModal from './EditTaskModal';
 
 interface TaskCardProps {
   task: Task;
+  onDelete?: (task: Task) => void;
 }
 
-const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
+const TaskCard: React.FC<TaskCardProps> = ({ task, onDelete }) => {
   const { state, dispatch } = useApp();
   const [showEditModal, setShowEditModal] = useState(false);
   const [showStatusDropdown, setShowStatusDropdown] = useState(false);
+  const [showActions, setShowActions] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const actionsRef = useRef<HTMLDivElement>(null);
   
   const assignee = state.users.find(u => u.id === task.assigneeId);
   const project = state.projects.find(p => p.id === task.projectId);
@@ -86,21 +91,24 @@ const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
     }
   };
 
-  // Close dropdown when clicking outside
+  // Close dropdowns when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setShowStatusDropdown(false);
       }
+      if (actionsRef.current && !actionsRef.current.contains(event.target as Node)) {
+        setShowActions(false);
+      }
     };
 
-    if (showStatusDropdown) {
+    if (showStatusDropdown || showActions) {
       document.addEventListener('mousedown', handleClickOutside);
       return () => {
         document.removeEventListener('mousedown', handleClickOutside);
       };
     }
-  }, [showStatusDropdown]);
+  }, [showStatusDropdown, showActions]);
 
   return (
     <>
@@ -251,18 +259,49 @@ const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
               </div>
             </div>
 
-            {/* Right side - Edit button */}
+            {/* Right side - Actions dropdown */}
             <div className="flex items-center space-x-2 ml-4">
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setShowEditModal(true);
-                }}
-                className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-gray-200 dark:hover:bg-gray-600 rounded"
-                title="Edit task"
-              >
-                <Edit2 size={14} className="text-gray-500 dark:text-gray-400" />
-              </button>
+              <div className="relative" ref={actionsRef}>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowActions(!showActions);
+                  }}
+                  className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-gray-200 dark:hover:bg-gray-600 rounded"
+                  title="Task actions"
+                >
+                  <MoreVertical size={14} className="text-gray-500 dark:text-gray-400" />
+                </button>
+                
+                {showActions && (
+                  <div className="absolute right-0 top-full mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg z-50 min-w-[140px]">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setShowEditModal(true);
+                        setShowActions(false);
+                      }}
+                      className="flex items-center w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-t-lg"
+                    >
+                      <Edit2 size={16} className="mr-3" />
+                      Edit Task
+                    </button>
+                    {onDelete && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onDelete(task);
+                          setShowActions(false);
+                        }}
+                        className="flex items-center w-full px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-b-lg"
+                      >
+                        <Trash2 size={16} className="mr-3" />
+                        Delete Task
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
