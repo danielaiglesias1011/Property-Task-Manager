@@ -9,6 +9,7 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { format, isAfter, isBefore } from 'date-fns';
+import SupabaseTest from '../components/Test/SupabaseTest';
 
 const Dashboard: React.FC = () => {
   const { state } = useApp();
@@ -247,6 +248,11 @@ const Dashboard: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Temporary Supabase Test */}
+      <div className="mt-8">
+        <SupabaseTest />
+      </div>
     </div>
   );
 };
