@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { AppProvider, useApp } from './context/AppContext';
+import { SupabaseAppProvider, useApp } from './context/SupabaseAppContext';
 import { ThemeProvider } from './context/ThemeContext';
 import Layout from './components/Layout/Layout';
 import Dashboard from './pages/Dashboard';
@@ -13,25 +13,32 @@ import ApprovalsView from './components/Approvals/ApprovalsView';
 import './App.css';
 
 const AppContent: React.FC = () => {
-  const { dispatch } = useApp();
+  const { state, dispatch } = useApp();
 
   useEffect(() => {
-    // Set default user on app load
-    dispatch({
-      type: 'SET_CURRENT_USER',
-      payload: {
-        id: '1',
-        name: 'Admin User',
-        email: 'admin@company.com',
-        approvalLevel: 3,
-        role: 'admin',
-        permissions: ['create_projects', 'edit_projects', 'delete_projects', 'approve_projects', 'manage_users', 'manage_settings'],
-        isArchived: false,
-        createdAt: new Date('2024-01-01'),
-        updatedAt: new Date('2024-01-01')
-      }
-    });
-  }, [dispatch]);
+    // Set default user on app load if we have users loaded
+    if (state.users.length > 0 && !state.currentUser) {
+      dispatch({
+        type: 'SET_CURRENT_USER',
+        payload: state.users[0] // Use the first user from Supabase
+      });
+    }
+  }, [state.users, state.currentUser, dispatch]);
+
+  // Show loading screen while data is being fetched
+  if (state.loading && state.users.length === 0) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading Property Task Manager...</p>
+          {state.error && (
+            <p className="text-red-600 mt-2">Error: {state.error}</p>
+          )}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <Router>
@@ -61,9 +68,9 @@ const AppContent: React.FC = () => {
 const App: React.FC = () => {
   return (
     <ThemeProvider>
-      <AppProvider>
+      <SupabaseAppProvider>
         <AppContent />
-      </AppProvider>
+      </SupabaseAppProvider>
     </ThemeProvider>
   );
 };
