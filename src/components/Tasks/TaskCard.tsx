@@ -267,7 +267,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, onDelete }) => {
                     e.stopPropagation();
                     setShowActions(!showActions);
                   }}
-                  className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-gray-200 dark:hover:bg-gray-600 rounded"
+                  className="opacity-100 p-1 hover:bg-gray-200 dark:hover:bg-gray-600 rounded"
                   title="Task actions"
                 >
                   <MoreVertical size={14} className="text-gray-500 dark:text-gray-400" />
