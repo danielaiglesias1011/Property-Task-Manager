@@ -10,6 +10,7 @@ import Tasks from './pages/Tasks';
 import Settings from './pages/Settings';
 import ForecastView from './components/Forecast/ForecastView';
 import ApprovalsView from './components/Approvals/ApprovalsView';
+import ErrorBoundary from './components/ErrorBoundary';
 import './App.css';
 
 // App component with Supabase integration
@@ -42,6 +43,34 @@ const AppContent: React.FC = () => {
     );
   }
 
+  // Debug info
+  console.log('App state:', {
+    loading: state.loading,
+    users: state.users.length,
+    properties: state.properties.length,
+    projects: state.projects.length,
+    error: state.error
+  });
+
+  // Show error screen if there's an error
+  if (state.error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-red-600 mb-4">Connection Error</h1>
+          <p className="text-gray-600 mb-4">Unable to connect to the database.</p>
+          <p className="text-sm text-gray-500 mb-4">Error: {state.error}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <Router>
       <Layout>
@@ -69,11 +98,13 @@ const AppContent: React.FC = () => {
 
 const App: React.FC = () => {
   return (
-    <ThemeProvider>
-      <SupabaseAppProvider>
-        <AppContent />
-      </SupabaseAppProvider>
-    </ThemeProvider>
+    <ErrorBoundary>
+      <ThemeProvider>
+        <SupabaseAppProvider>
+          <AppContent />
+        </SupabaseAppProvider>
+      </ThemeProvider>
+    </ErrorBoundary>
   );
 };
 
