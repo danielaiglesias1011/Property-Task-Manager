@@ -1,7 +1,7 @@
 import React from 'react';
 import { Property } from '../../types';
 import { Building2, FolderOpen, CheckSquare, Calendar } from 'lucide-react';
-import { useApp } from '../../context/AppContext';
+import { useApp } from '../../context/HybridAppContext';
 
 interface PropertyCardProps {
   property: Property;

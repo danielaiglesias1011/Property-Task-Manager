@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Task } from '../../types';
-import { useApp } from '../../context/AppContext';
+import { useApp } from '../../context/HybridAppContext';
 import { 
   CheckSquare, 
   Calendar, 

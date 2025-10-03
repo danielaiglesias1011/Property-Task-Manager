@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useApp } from '../context/AppContext';
+import { useApp } from '../context/HybridAppContext';
 import { Property } from '../types';
 import PropertyCard from '../components/Properties/PropertyCard';
 import PropertyDetail from '../components/Properties/PropertyDetail';

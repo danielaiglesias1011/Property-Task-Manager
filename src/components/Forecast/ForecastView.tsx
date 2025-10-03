@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { useApp } from '../../context/AppContext';
+import { useApp } from '../../context/HybridAppContext';
 import { TrendingUp, DollarSign, CheckCircle, Calendar, Folder, User, CheckSquare, RotateCcw, Building } from 'lucide-react';
 import { format } from 'date-fns';
 import { FundingDetail, Project } from '../../types';

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Property } from '../../types';
-import { useApp } from '../../context/AppContext';
+import { useApp } from '../../context/HybridAppContext';
 import { ArrowLeft, Plus, FolderOpen, CheckSquare, DollarSign, Calendar, ChevronDown, ChevronRight } from 'lucide-react';
 import { format } from 'date-fns';
 import ProjectCard from '../Projects/ProjectCard';

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useApp } from '../context/AppContext';
+import { useApp } from '../context/HybridAppContext';
 import { FolderOpen, Plus, Filter } from 'lucide-react';
 import ProjectCard from '../components/Projects/ProjectCard';
 import CreateProjectModal from '../components/Projects/CreateProjectModal';

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useApp } from '../../context/AppContext';
+import { useApp } from '../../context/HybridAppContext';
 import { Property } from '../../types';
 import { X, Building2, MapPin, FileText } from 'lucide-react';
 import { v4 as uuidv4 } from 'uuid';

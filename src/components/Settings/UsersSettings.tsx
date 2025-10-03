@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useApp } from '../../context/AppContext';
+import { useApp } from '../../context/HybridAppContext';
 import { User } from '../../types';
 import { Plus, Edit, Trash2, Archive, UserCheck, UserX, Mail, Shield } from 'lucide-react';
 import { v4 as uuidv4 } from 'uuid';

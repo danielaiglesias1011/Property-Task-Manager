@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useApp } from '../../context/AppContext';
+import { useApp } from '../../context/HybridAppContext';
 import { AttachmentType } from '../../types';
 import { Plus, Edit, Trash2, Paperclip, FolderOpen } from 'lucide-react';
 import { v4 as uuidv4 } from 'uuid';

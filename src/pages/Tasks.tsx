@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useApp } from '../context/AppContext';
+import { useApp } from '../context/HybridAppContext';
 import { CheckSquare, Plus, Filter, ChevronDown, ChevronRight } from 'lucide-react';
 import TaskCard from '../components/Tasks/TaskCard';
 import CreateTaskModal from '../components/Tasks/CreateTaskModal';

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Project } from '../../types';
-import { useApp } from '../../context/AppContext';
+import { useApp } from '../../context/HybridAppContext';
 import { 
   Calendar, 
   DollarSign, 

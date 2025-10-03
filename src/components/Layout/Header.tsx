@@ -1,5 +1,5 @@
 import React from 'react';
-import { useApp } from '../../context/AppContext';
+import { useApp } from '../../context/HybridAppContext';
 import { Bell, User } from 'lucide-react';
 
 const Header: React.FC = () => {

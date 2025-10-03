@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useApp } from '../../context/AppContext';
+import { useApp } from '../../context/HybridAppContext';
 import { v4 as uuidv4 } from 'uuid';
 import { X, Upload, Trash2, Eye } from 'lucide-react';
 import { Task, Attachment, Comment } from '../../types';
