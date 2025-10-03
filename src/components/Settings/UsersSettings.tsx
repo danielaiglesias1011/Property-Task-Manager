@@ -3,9 +3,17 @@ import { useApp } from '../../context/AppContext';
 import { User } from '../../types';
 import { Plus, Edit, Trash2, Archive, UserCheck, UserX, Mail, Shield } from 'lucide-react';
 import { v4 as uuidv4 } from 'uuid';
+import { useModal } from '../../hooks/useModal';
+import ConfirmModal from '../Common/ConfirmModal';
 
 const UsersSettings: React.FC = () => {
   const { state, dispatch } = useApp();
+  const { 
+    confirmModal, 
+    showConfirm, 
+    closeConfirm, 
+    handleConfirm 
+  } = useModal();
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [showArchived, setShowArchived] = useState(false);
@@ -114,12 +122,22 @@ const UsersSettings: React.FC = () => {
   };
 
   const handleDelete = (userId: string) => {
-    if (window.confirm('Are you sure you want to permanently delete this user?')) {
-      dispatch({
-        type: 'DELETE_USER',
-        payload: userId
-      });
-    }
+    const user = state.users.find(u => u.id === userId);
+    showConfirm(
+      'Delete User',
+      `Are you sure you want to permanently delete ${user?.name || 'this user'}? This action cannot be undone.`,
+      () => {
+        dispatch({
+          type: 'DELETE_USER',
+          payload: userId
+        });
+      },
+      {
+        confirmText: 'Delete',
+        cancelText: 'Cancel',
+        type: 'danger'
+      }
+    );
   };
 
   const handleArchive = (userId: string, archive: boolean) => {
@@ -467,6 +485,18 @@ const UsersSettings: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Confirm Modal */}
+      <ConfirmModal
+        isOpen={confirmModal.isOpen}
+        onClose={closeConfirm}
+        onConfirm={handleConfirm}
+        title={confirmModal.title}
+        message={confirmModal.message}
+        confirmText={confirmModal.confirmText}
+        cancelText={confirmModal.cancelText}
+        type={confirmModal.type}
+      />
     </div>
   );
 };

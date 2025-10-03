@@ -3,9 +3,17 @@ import { useApp } from '../../context/AppContext';
 import { ApprovalGroup, User } from '../../types';
 import { Plus, Edit, Trash2, Users, UserPlus, UserMinus } from 'lucide-react';
 import { v4 as uuidv4 } from 'uuid';
+import { useModal } from '../../hooks/useModal';
+import ConfirmModal from '../Common/ConfirmModal';
 
 const ApprovalGroupsSettings: React.FC = () => {
   const { state, dispatch } = useApp();
+  const { 
+    confirmModal, 
+    showConfirm, 
+    closeConfirm, 
+    handleConfirm 
+  } = useModal();
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [editingGroup, setEditingGroup] = useState<ApprovalGroup | null>(null);
   const [formData, setFormData] = useState({
@@ -90,12 +98,21 @@ const ApprovalGroupsSettings: React.FC = () => {
   };
 
   const handleDelete = (groupId: string) => {
-    if (window.confirm('Are you sure you want to delete this approval group?')) {
-      dispatch({
-        type: 'DELETE_APPROVAL_GROUP',
-        payload: groupId
-      });
-    }
+    showConfirm(
+      'Delete Approval Group',
+      'Are you sure you want to delete this approval group?',
+      () => {
+        dispatch({
+          type: 'DELETE_APPROVAL_GROUP',
+          payload: groupId
+        });
+      },
+      {
+        confirmText: 'Delete',
+        cancelText: 'Cancel',
+        type: 'danger'
+      }
+    );
   };
 
   const handleCancel = () => {
@@ -351,6 +368,18 @@ const ApprovalGroupsSettings: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Confirm Modal */}
+      <ConfirmModal
+        isOpen={confirmModal.isOpen}
+        onClose={closeConfirm}
+        onConfirm={handleConfirm}
+        title={confirmModal.title}
+        message={confirmModal.message}
+        confirmText={confirmModal.confirmText}
+        cancelText={confirmModal.cancelText}
+        type={confirmModal.type}
+      />
     </div>
   );
 };

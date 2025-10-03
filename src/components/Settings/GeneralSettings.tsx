@@ -11,6 +11,9 @@ import {
   RefreshCw
 } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
+import { useModal } from '../../hooks/useModal';
+import ConfirmModal from '../Common/ConfirmModal';
+import AlertModal from '../Common/AlertModal';
 
 interface AppSettings {
   theme: string;
@@ -38,6 +41,15 @@ interface AppSettings {
 
 const GeneralSettings: React.FC = () => {
   const { theme, setTheme } = useTheme();
+  const { 
+    confirmModal, 
+    alertModal, 
+    showConfirm, 
+    showAlert, 
+    closeConfirm, 
+    closeAlert, 
+    handleConfirm 
+  } = useModal();
   
   // Load settings from localStorage or use defaults
   const getInitialSettings = (): AppSettings => {
@@ -124,56 +136,65 @@ const GeneralSettings: React.FC = () => {
         setTheme(settings.theme as 'light' | 'dark' | 'auto');
       }
       
-      alert('Settings saved successfully!');
+      showAlert('Success', 'Settings saved successfully!', { type: 'success' });
     } catch (error) {
       console.error('Error saving settings:', error);
-      alert('Error saving settings. Please try again.');
+      showAlert('Error', 'Error saving settings. Please try again.', { type: 'error' });
     }
   };
 
   const handleReset = () => {
-    if (window.confirm('Are you sure you want to reset all settings to default values?')) {
-      // Reset to default values
-      const defaultSettings: AppSettings = {
-        theme: 'light',
-        notifications: {
-          email: true,
-          push: false,
-          projectUpdates: true,
-          taskAssignments: true,
-          approvals: true,
-          reminders: true
-        },
-        language: 'en',
-        timezone: 'UTC',
-        dateFormat: 'MM/DD/YYYY',
-        timeFormat: '12h',
-        autoSave: true,
-        sessionTimeout: 30,
-        dataRetention: 365,
-        security: {
-          twoFactor: false,
-          passwordExpiry: 90,
-          sessionTimeout: 30
+    showConfirm(
+      'Reset Settings',
+      'Are you sure you want to reset all settings to default values?',
+      () => {
+        // Reset to default values
+        const defaultSettings: AppSettings = {
+          theme: 'light',
+          notifications: {
+            email: true,
+            push: false,
+            projectUpdates: true,
+            taskAssignments: true,
+            approvals: true,
+            reminders: true
+          },
+          language: 'en',
+          timezone: 'UTC',
+          dateFormat: 'MM/DD/YYYY',
+          timeFormat: '12h',
+          autoSave: true,
+          sessionTimeout: 30,
+          dataRetention: 365,
+          security: {
+            twoFactor: false,
+            passwordExpiry: 90,
+            sessionTimeout: 30
+          }
+        };
+        
+        setSettings(defaultSettings);
+        
+        // Apply theme change when resetting
+        if (defaultSettings.theme !== theme) {
+          setTheme(defaultSettings.theme as 'light' | 'dark' | 'auto');
         }
-      };
-      
-      setSettings(defaultSettings);
-      
-      // Apply theme change when resetting
-      if (defaultSettings.theme !== theme) {
-        setTheme(defaultSettings.theme as 'light' | 'dark' | 'auto');
+        
+        // Save reset settings to localStorage
+        try {
+          localStorage.setItem('propertyManager_generalSettings', JSON.stringify(defaultSettings));
+          showAlert('Success', 'Settings reset to defaults successfully!', { type: 'success' });
+        } catch (error) {
+          console.error('Error saving reset settings:', error);
+          showAlert('Warning', 'Settings reset but failed to save. Please try saving manually.', { type: 'warning' });
+        }
+      },
+      {
+        confirmText: 'Reset',
+        cancelText: 'Cancel',
+        type: 'warning'
       }
-      
-      // Save reset settings to localStorage
-      try {
-        localStorage.setItem('propertyManager_generalSettings', JSON.stringify(defaultSettings));
-        alert('Settings reset to defaults successfully!');
-      } catch (error) {
-        console.error('Error saving reset settings:', error);
-        alert('Settings reset but failed to save. Please try saving manually.');
-      }
-    }
+    );
   };
 
   // Safety check to ensure settings are properly initialized
@@ -463,6 +484,28 @@ const GeneralSettings: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Modals */}
+      <ConfirmModal
+        isOpen={confirmModal.isOpen}
+        onClose={closeConfirm}
+        onConfirm={handleConfirm}
+        title={confirmModal.title}
+        message={confirmModal.message}
+        confirmText={confirmModal.confirmText}
+        cancelText={confirmModal.cancelText}
+        type={confirmModal.type}
+      />
+
+      <AlertModal
+        isOpen={alertModal.isOpen}
+        onClose={closeAlert}
+        title={alertModal.title}
+        message={alertModal.message}
+        type={alertModal.type}
+        autoClose={alertModal.autoClose}
+        autoCloseDelay={alertModal.autoCloseDelay}
+      />
     </div>
   );
 };
