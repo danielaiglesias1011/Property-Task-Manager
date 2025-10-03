@@ -12,6 +12,8 @@ import ForecastView from './components/Forecast/ForecastView';
 import ApprovalsView from './components/Approvals/ApprovalsView';
 import './App.css';
 
+// App component with Supabase integration
+
 const AppContent: React.FC = () => {
   const { state, dispatch } = useApp();
 
