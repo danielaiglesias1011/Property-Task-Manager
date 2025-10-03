@@ -725,6 +725,7 @@ export const SupabaseAppProvider: React.FC<{ children: ReactNode }> = ({ childre
 export const useApp = () => {
   const context = useContext(AppContext);
   if (!context) {
+    console.error('useApp must be used within a SupabaseAppProvider');
     throw new Error('useApp must be used within a SupabaseAppProvider');
   }
   return context;
