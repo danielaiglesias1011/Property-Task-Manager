@@ -3,6 +3,7 @@ import { useApp } from '../../context/HybridAppContext';
 import { v4 as uuidv4 } from 'uuid';
 import { X, Upload, Plus, Trash2, Eye } from 'lucide-react';
 import { Project, FundingDetail, Attachment } from '../../types';
+import * as supabaseService from '../../services/supabaseService';
 
 // Form-specific interface for funding details that allows string amounts during input
 interface FundingDetailForm {
@@ -91,7 +92,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ propertyId, onC
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!validateForm()) return;
@@ -131,8 +132,17 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ propertyId, onC
       tasks: []
     };
 
-    dispatch({ type: 'ADD_PROJECT', payload: newProject });
-    onClose();
+    try {
+      // Save to Supabase first
+      const savedProject = await supabaseService.projectService.create(newProject);
+      
+      // Then update local state
+      dispatch({ type: 'ADD_PROJECT', payload: savedProject });
+      onClose();
+    } catch (error) {
+      console.error('Error creating project:', error);
+      setErrors({ submit: 'Failed to create project. Please try again.' });
+    }
   };
 
   const addFundingDetail = () => {
@@ -662,6 +672,13 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ propertyId, onC
               </div>
             )}
           </div>
+
+          {/* Submit Error */}
+          {errors.submit && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+              <p className="text-red-700 text-sm">{errors.submit}</p>
+            </div>
+          )}
 
           {/* Submit */}
           <div className="flex justify-end space-x-3 pt-6 border-t border-gray-200">

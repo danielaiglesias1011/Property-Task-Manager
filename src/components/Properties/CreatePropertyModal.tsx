@@ -3,6 +3,7 @@ import { useApp } from '../../context/HybridAppContext';
 import { Property } from '../../types';
 import { X, Building2, MapPin, FileText } from 'lucide-react';
 import { v4 as uuidv4 } from 'uuid';
+import * as supabaseService from '../../services/supabaseService';
 
 interface CreatePropertyModalProps {
   onClose: () => void;
@@ -27,7 +28,7 @@ const CreatePropertyModal: React.FC<CreatePropertyModalProps> = ({ onClose }) =>
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!validateForm()) return;
@@ -41,8 +42,17 @@ const CreatePropertyModal: React.FC<CreatePropertyModalProps> = ({ onClose }) =>
       updatedAt: new Date()
     };
 
-    dispatch({ type: 'ADD_PROPERTY', payload: newProperty });
-    onClose();
+    try {
+      // Save to Supabase first
+      const savedProperty = await supabaseService.propertyService.create(newProperty);
+      
+      // Then update local state
+      dispatch({ type: 'ADD_PROPERTY', payload: savedProperty });
+      onClose();
+    } catch (error) {
+      console.error('Error creating property:', error);
+      setErrors({ submit: 'Failed to create property. Please try again.' });
+    }
   };
 
   return (
@@ -127,6 +137,13 @@ const CreatePropertyModal: React.FC<CreatePropertyModalProps> = ({ onClose }) =>
             </div>
           </div>
 
+
+          {/* Submit Error */}
+          {errors.submit && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+              <p className="text-red-700 text-sm">{errors.submit}</p>
+            </div>
+          )}
 
           {/* Form Actions */}
           <div className="flex justify-end space-x-3 pt-6 border-t border-gray-200 dark:border-gray-600">
