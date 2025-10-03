@@ -259,7 +259,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, onDelete }) => {
               </div>
             </div>
 
-            {/* Right side - Actions dropdown */}
+            {/* Right side - Actions dropdown with edit and delete */}
             <div className="flex items-center space-x-2 ml-4">
               <div className="relative" ref={actionsRef}>
                 <button
