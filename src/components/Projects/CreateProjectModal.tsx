@@ -133,6 +133,14 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ propertyId, onC
     };
 
     try {
+      console.log('Creating project with data:', {
+        name: newProject.name,
+        category: newProject.category,
+        budget: newProject.budget,
+        fundingDetails: newProject.fundingDetails,
+        attachments: newProject.attachments
+      });
+      
       // Save to Supabase first
       const savedProject = await supabaseService.projectService.create(newProject);
       
@@ -141,7 +149,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ propertyId, onC
       onClose();
     } catch (error) {
       console.error('Error creating project:', error);
-      setErrors({ submit: 'Failed to create project. Please try again.' });
+      setErrors({ submit: `Failed to create project: ${error instanceof Error ? error.message : 'Unknown error'}` });
     }
   };
 
