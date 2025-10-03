@@ -138,6 +138,9 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ propertyId, onC
         name: newProject.name,
         category: newProject.category,
         budget: newProject.budget,
+        approvalType: newProject.approvalType,
+        assignedApproverId: newProject.assignedApproverId,
+        assignedApprovalGroupId: newProject.assignedApprovalGroupId,
         fundingDetails: newProject.fundingDetails,
         attachments: newProject.attachments
       });
