@@ -379,6 +379,36 @@ export const HybridAppProvider: React.FC<{ children: ReactNode }> = ({ children 
         dispatch({ type: 'SET_PROJECT_CATEGORIES', payload: categories });
       }
 
+      // Load attachment types
+      const { data: attachmentTypesData, error: attachmentTypesError } = await supabase
+        .from('attachment_types')
+        .select('*');
+      
+      if (attachmentTypesError) {
+        console.warn('Could not load attachment types:', attachmentTypesError);
+        // Set default attachment types if database doesn't have them
+        const defaultAttachmentTypes = [
+          { id: '1', name: 'Project Plan', category: 'project', isDefault: true },
+          { id: '2', name: 'Budget Estimate', category: 'project', isDefault: true },
+          { id: '3', name: 'Contract', category: 'project', isDefault: true },
+          { id: '4', name: 'Invoice', category: 'project', isDefault: true },
+          { id: '5', name: 'Photo', category: 'project', isDefault: true },
+          { id: '6', name: 'Document', category: 'project', isDefault: true },
+          { id: '7', name: 'Task Description', category: 'task', isDefault: true },
+          { id: '8', name: 'Progress Report', category: 'task', isDefault: true },
+          { id: '9', name: 'Completion Photo', category: 'task', isDefault: true }
+        ];
+        dispatch({ type: 'SET_ATTACHMENT_TYPES', payload: defaultAttachmentTypes });
+      } else {
+        const attachmentTypes = attachmentTypesData?.map((row: any) => ({
+          id: row.id || '',
+          name: row.name || '',
+          category: row.category || 'project',
+          isDefault: row.is_default || false
+        })) || [];
+        dispatch({ type: 'SET_ATTACHMENT_TYPES', payload: attachmentTypes });
+      }
+
       // Set default user if we have users and no current user
       if (users.length > 0 && !state.currentUser) {
         dispatch({ type: 'SET_CURRENT_USER', payload: users[0] });
