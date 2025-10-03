@@ -388,22 +388,22 @@ export const HybridAppProvider: React.FC<{ children: ReactNode }> = ({ children 
         console.warn('Could not load attachment types:', attachmentTypesError);
         // Set default attachment types if database doesn't have them
         const defaultAttachmentTypes = [
-          { id: '1', name: 'Project Plan', category: 'project', isDefault: true },
-          { id: '2', name: 'Budget Estimate', category: 'project', isDefault: true },
-          { id: '3', name: 'Contract', category: 'project', isDefault: true },
-          { id: '4', name: 'Invoice', category: 'project', isDefault: true },
-          { id: '5', name: 'Photo', category: 'project', isDefault: true },
-          { id: '6', name: 'Document', category: 'project', isDefault: true },
-          { id: '7', name: 'Task Description', category: 'task', isDefault: true },
-          { id: '8', name: 'Progress Report', category: 'task', isDefault: true },
-          { id: '9', name: 'Completion Photo', category: 'task', isDefault: true }
+          { id: '1', name: 'Project Plan', category: 'project' as 'project' | 'task', isDefault: true },
+          { id: '2', name: 'Budget Estimate', category: 'project' as 'project' | 'task', isDefault: true },
+          { id: '3', name: 'Contract', category: 'project' as 'project' | 'task', isDefault: true },
+          { id: '4', name: 'Invoice', category: 'project' as 'project' | 'task', isDefault: true },
+          { id: '5', name: 'Photo', category: 'project' as 'project' | 'task', isDefault: true },
+          { id: '6', name: 'Document', category: 'project' as 'project' | 'task', isDefault: true },
+          { id: '7', name: 'Task Description', category: 'task' as 'project' | 'task', isDefault: true },
+          { id: '8', name: 'Progress Report', category: 'task' as 'project' | 'task', isDefault: true },
+          { id: '9', name: 'Completion Photo', category: 'task' as 'project' | 'task', isDefault: true }
         ];
         dispatch({ type: 'SET_ATTACHMENT_TYPES', payload: defaultAttachmentTypes });
       } else {
         const attachmentTypes = attachmentTypesData?.map((row: any) => ({
           id: row.id || '',
           name: row.name || '',
-          category: row.category || 'project',
+          category: (row.category || 'project') as 'project' | 'task',
           isDefault: row.is_default || false
         })) || [];
         dispatch({ type: 'SET_ATTACHMENT_TYPES', payload: attachmentTypes });
