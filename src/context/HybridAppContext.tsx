@@ -13,9 +13,11 @@ type AppAction =
   | { type: 'SET_PROPERTIES'; payload: Property[] }
   | { type: 'ADD_PROPERTY'; payload: Property }
   | { type: 'UPDATE_PROPERTY'; payload: Property }
+  | { type: 'DELETE_PROPERTY'; payload: string }
   | { type: 'SET_PROJECTS'; payload: Project[] }
   | { type: 'ADD_PROJECT'; payload: Project }
   | { type: 'UPDATE_PROJECT'; payload: Project }
+  | { type: 'DELETE_PROJECT'; payload: string }
   | { type: 'SET_TASKS'; payload: Task[] }
   | { type: 'ADD_TASK'; payload: Task }
   | { type: 'UPDATE_TASK'; payload: Task }
@@ -50,6 +52,28 @@ interface AppContextType {
   // Async action creators
   loadAllData: () => Promise<void>;
   refreshData: () => Promise<void>;
+  // Supabase sync actions
+  addProperty: (property: Omit<Property, 'id' | 'createdAt' | 'updatedAt'>) => Promise<void>;
+  updateProperty: (property: Property) => Promise<void>;
+  deleteProperty: (id: string) => Promise<void>;
+  addProject: (project: Omit<Project, 'id' | 'createdAt' | 'updatedAt'>) => Promise<void>;
+  updateProject: (project: Project) => Promise<void>;
+  deleteProject: (id: string) => Promise<void>;
+  addTask: (task: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>) => Promise<void>;
+  updateTask: (task: Task) => Promise<void>;
+  deleteTask: (id: string) => Promise<void>;
+  addCategory: (category: Omit<ProjectCategory, 'id' | 'createdAt'>) => Promise<void>;
+  updateCategory: (category: ProjectCategory) => Promise<void>;
+  deleteCategory: (id: string) => Promise<void>;
+  addPriority: (priority: Omit<Priority, 'id' | 'createdAt'>) => Promise<void>;
+  updatePriority: (priority: Priority) => Promise<void>;
+  deletePriority: (id: string) => Promise<void>;
+  addStatus: (status: Omit<Status, 'id' | 'createdAt'>) => Promise<void>;
+  updateStatus: (status: Status) => Promise<void>;
+  deleteStatus: (id: string) => Promise<void>;
+  addAttachmentType: (attachmentType: Omit<AttachmentType, 'id'>) => Promise<void>;
+  updateAttachmentType: (attachmentType: AttachmentType) => Promise<void>;
+  deleteAttachmentType: (id: string) => Promise<void>;
 }
 
 const initialState: AppState & { loading: boolean; error: string | null } = {
@@ -164,6 +188,11 @@ const appReducer = (state: AppState & { loading: boolean; error: string | null }
           property.id === action.payload.id ? action.payload : property
         )
       };
+    case 'DELETE_PROPERTY':
+      return { 
+        ...state, 
+        properties: state.properties.filter(property => property.id !== action.payload)
+      };
     case 'SET_PROJECTS':
       return { ...state, projects: action.payload };
     case 'ADD_PROJECT':
@@ -174,6 +203,11 @@ const appReducer = (state: AppState & { loading: boolean; error: string | null }
         projects: state.projects.map(project => 
           project.id === action.payload.id ? action.payload : project
         )
+      };
+    case 'DELETE_PROJECT':
+      return { 
+        ...state, 
+        projects: state.projects.filter(project => project.id !== action.payload)
       };
     case 'SET_TASKS':
       return { ...state, tasks: action.payload };
@@ -307,6 +341,456 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export const HybridAppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [state, dispatch] = useReducer(appReducer, initialState);
+
+  // Supabase sync actions
+  const addProperty = async (property: Omit<Property, 'id' | 'createdAt' | 'updatedAt'>) => {
+    try {
+      const { data, error } = await supabase
+        .from('properties')
+        .insert([{
+          name: property.name,
+          address: property.address,
+          description: property.description
+        }])
+        .select()
+        .single();
+
+      if (error) throw error;
+      const newProperty = convertRowToProperty(data);
+      dispatch({ type: 'ADD_PROPERTY', payload: newProperty });
+    } catch (error) {
+      console.error('Error adding property:', error);
+      throw error;
+    }
+  };
+
+  const updateProperty = async (property: Property) => {
+    try {
+      const { error } = await supabase
+        .from('properties')
+        .update({
+          name: property.name,
+          address: property.address,
+          description: property.description,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', property.id);
+
+      if (error) throw error;
+      dispatch({ type: 'UPDATE_PROPERTY', payload: property });
+    } catch (error) {
+      console.error('Error updating property:', error);
+      throw error;
+    }
+  };
+
+  const deleteProperty = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('properties')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+      dispatch({ type: 'DELETE_PROPERTY', payload: id });
+    } catch (error) {
+      console.error('Error deleting property:', error);
+      throw error;
+    }
+  };
+
+  const addProject = async (project: Omit<Project, 'id' | 'createdAt' | 'updatedAt'>) => {
+    try {
+      const { data, error } = await supabase
+        .from('projects')
+        .insert([{
+          name: project.name,
+          description: project.description,
+          property_id: project.propertyId,
+          budget: project.budget,
+          category: project.category,
+          start_date: project.startDate.toISOString().split('T')[0],
+          end_date: project.endDate.toISOString().split('T')[0],
+          status: project.status,
+          priority: project.priority,
+          approval_type: project.approvalType,
+          approval_level: project.approvalLevel,
+          assigned_approver_id: project.assignedApproverId,
+          created_by: project.createdBy
+        }])
+        .select()
+        .single();
+
+      if (error) throw error;
+      const newProject = convertRowToProject(data);
+      dispatch({ type: 'ADD_PROJECT', payload: newProject });
+    } catch (error) {
+      console.error('Error adding project:', error);
+      throw error;
+    }
+  };
+
+  const updateProject = async (project: Project) => {
+    try {
+      const { error } = await supabase
+        .from('projects')
+        .update({
+          name: project.name,
+          description: project.description,
+          property_id: project.propertyId,
+          budget: project.budget,
+          category: project.category,
+          start_date: project.startDate.toISOString().split('T')[0],
+          end_date: project.endDate.toISOString().split('T')[0],
+          status: project.status,
+          priority: project.priority,
+          approval_type: project.approvalType,
+          approval_level: project.approvalLevel,
+          assigned_approver_id: project.assignedApproverId,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', project.id);
+
+      if (error) throw error;
+      dispatch({ type: 'UPDATE_PROJECT', payload: project });
+    } catch (error) {
+      console.error('Error updating project:', error);
+      throw error;
+    }
+  };
+
+  const deleteProject = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('projects')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+      dispatch({ type: 'DELETE_PROJECT', payload: id });
+    } catch (error) {
+      console.error('Error deleting project:', error);
+      throw error;
+    }
+  };
+
+  const addTask = async (task: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>) => {
+    try {
+      const { data, error } = await supabase
+        .from('tasks')
+        .insert([{
+          name: task.name,
+          description: task.description,
+          start_date: task.startDate.toISOString().split('T')[0],
+          end_date: task.endDate.toISOString().split('T')[0],
+          assignee_id: task.assigneeId,
+          property_id: task.propertyId,
+          project_id: task.projectId,
+          status: task.status,
+          priority: task.priority
+        }])
+        .select()
+        .single();
+
+      if (error) throw error;
+      const newTask = convertRowToTask(data);
+      dispatch({ type: 'ADD_TASK', payload: newTask });
+    } catch (error) {
+      console.error('Error adding task:', error);
+      throw error;
+    }
+  };
+
+  const updateTask = async (task: Task) => {
+    try {
+      const { error } = await supabase
+        .from('tasks')
+        .update({
+          name: task.name,
+          description: task.description,
+          start_date: task.startDate.toISOString().split('T')[0],
+          end_date: task.endDate.toISOString().split('T')[0],
+          assignee_id: task.assigneeId,
+          property_id: task.propertyId,
+          project_id: task.projectId,
+          status: task.status,
+          priority: task.priority,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', task.id);
+
+      if (error) throw error;
+      dispatch({ type: 'UPDATE_TASK', payload: task });
+    } catch (error) {
+      console.error('Error updating task:', error);
+      throw error;
+    }
+  };
+
+  const deleteTask = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('tasks')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+      dispatch({ type: 'DELETE_TASK', payload: id });
+    } catch (error) {
+      console.error('Error deleting task:', error);
+      throw error;
+    }
+  };
+
+  // Settings sync actions
+  const addCategory = async (category: Omit<ProjectCategory, 'id' | 'createdAt'>) => {
+    try {
+      const { data, error } = await supabase
+        .from('project_categories')
+        .insert([{
+          name: category.name,
+          description: category.description,
+          is_default: category.isDefault
+        }])
+        .select()
+        .single();
+
+      if (error) throw error;
+      const newCategory = {
+        id: data.id,
+        name: data.name,
+        description: data.description,
+        isDefault: data.is_default,
+        createdAt: new Date(data.created_at)
+      };
+      dispatch({ type: 'ADD_PROJECT_CATEGORY', payload: newCategory });
+    } catch (error) {
+      console.error('Error adding category:', error);
+      throw error;
+    }
+  };
+
+  const updateCategory = async (category: ProjectCategory) => {
+    try {
+      const { error } = await supabase
+        .from('project_categories')
+        .update({
+          name: category.name,
+          description: category.description,
+          is_default: category.isDefault
+        })
+        .eq('id', category.id);
+
+      if (error) throw error;
+      dispatch({ type: 'UPDATE_PROJECT_CATEGORY', payload: category });
+    } catch (error) {
+      console.error('Error updating category:', error);
+      throw error;
+    }
+  };
+
+  const deleteCategory = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('project_categories')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+      dispatch({ type: 'DELETE_PROJECT_CATEGORY', payload: id });
+    } catch (error) {
+      console.error('Error deleting category:', error);
+      throw error;
+    }
+  };
+
+  const addPriority = async (priority: Omit<Priority, 'id' | 'createdAt'>) => {
+    try {
+      const { data, error } = await supabase
+        .from('priorities')
+        .insert([{
+          name: priority.name,
+          level: priority.level,
+          color: priority.color,
+          is_default: priority.isDefault
+        }])
+        .select()
+        .single();
+
+      if (error) throw error;
+      const newPriority = {
+        id: data.id,
+        name: data.name,
+        level: data.level,
+        color: data.color,
+        isDefault: data.is_default,
+        createdAt: new Date(data.created_at)
+      };
+      dispatch({ type: 'ADD_PRIORITY', payload: newPriority });
+    } catch (error) {
+      console.error('Error adding priority:', error);
+      throw error;
+    }
+  };
+
+  const updatePriority = async (priority: Priority) => {
+    try {
+      const { error } = await supabase
+        .from('priorities')
+        .update({
+          name: priority.name,
+          level: priority.level,
+          color: priority.color,
+          is_default: priority.isDefault
+        })
+        .eq('id', priority.id);
+
+      if (error) throw error;
+      dispatch({ type: 'UPDATE_PRIORITY', payload: priority });
+    } catch (error) {
+      console.error('Error updating priority:', error);
+      throw error;
+    }
+  };
+
+  const deletePriority = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('priorities')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+      dispatch({ type: 'DELETE_PRIORITY', payload: id });
+    } catch (error) {
+      console.error('Error deleting priority:', error);
+      throw error;
+    }
+  };
+
+  const addStatus = async (status: Omit<Status, 'id' | 'createdAt'>) => {
+    try {
+      const { data, error } = await supabase
+        .from('statuses')
+        .insert([{
+          name: status.name,
+          type: status.type,
+          color: status.color,
+          is_default: status.isDefault
+        }])
+        .select()
+        .single();
+
+      if (error) throw error;
+      const newStatus = {
+        id: data.id,
+        name: data.name,
+        type: data.type,
+        color: data.color,
+        isDefault: data.is_default,
+        createdAt: new Date(data.created_at)
+      };
+      dispatch({ type: 'ADD_STATUS', payload: newStatus });
+    } catch (error) {
+      console.error('Error adding status:', error);
+      throw error;
+    }
+  };
+
+  const updateStatus = async (status: Status) => {
+    try {
+      const { error } = await supabase
+        .from('statuses')
+        .update({
+          name: status.name,
+          type: status.type,
+          color: status.color,
+          is_default: status.isDefault
+        })
+        .eq('id', status.id);
+
+      if (error) throw error;
+      dispatch({ type: 'UPDATE_STATUS', payload: status });
+    } catch (error) {
+      console.error('Error updating status:', error);
+      throw error;
+    }
+  };
+
+  const deleteStatus = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('statuses')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+      dispatch({ type: 'DELETE_STATUS', payload: id });
+    } catch (error) {
+      console.error('Error deleting status:', error);
+      throw error;
+    }
+  };
+
+  const addAttachmentType = async (attachmentType: Omit<AttachmentType, 'id'>) => {
+    try {
+      const { data, error } = await supabase
+        .from('attachment_types')
+        .insert([{
+          name: attachmentType.name,
+          category: attachmentType.category,
+          is_default: attachmentType.isDefault
+        }])
+        .select()
+        .single();
+
+      if (error) throw error;
+      const newAttachmentType = {
+        id: data.id,
+        name: data.name,
+        category: data.category,
+        isDefault: data.is_default
+      };
+      dispatch({ type: 'ADD_ATTACHMENT_TYPE', payload: newAttachmentType });
+    } catch (error) {
+      console.error('Error adding attachment type:', error);
+      throw error;
+    }
+  };
+
+  const updateAttachmentType = async (attachmentType: AttachmentType) => {
+    try {
+      const { error } = await supabase
+        .from('attachment_types')
+        .update({
+          name: attachmentType.name,
+          category: attachmentType.category,
+          is_default: attachmentType.isDefault
+        })
+        .eq('id', attachmentType.id);
+
+      if (error) throw error;
+      dispatch({ type: 'UPDATE_ATTACHMENT_TYPE', payload: attachmentType });
+    } catch (error) {
+      console.error('Error updating attachment type:', error);
+      throw error;
+    }
+  };
+
+  const deleteAttachmentType = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('attachment_types')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+      dispatch({ type: 'DELETE_ATTACHMENT_TYPE', payload: id });
+    } catch (error) {
+      console.error('Error deleting attachment type:', error);
+      throw error;
+    }
+  };
 
   // Load data from Supabase
   const loadAllData = async () => {
@@ -541,7 +1025,28 @@ export const HybridAppProvider: React.FC<{ children: ReactNode }> = ({ children 
     state,
     dispatch,
     loadAllData,
-    refreshData
+    refreshData,
+    addProperty,
+    updateProperty,
+    deleteProperty,
+    addProject,
+    updateProject,
+    deleteProject,
+    addTask,
+    updateTask,
+    deleteTask,
+    addCategory,
+    updateCategory,
+    deleteCategory,
+    addPriority,
+    updatePriority,
+    deletePriority,
+    addStatus,
+    updateStatus,
+    deleteStatus,
+    addAttachmentType,
+    updateAttachmentType,
+    deleteAttachmentType
   };
 
   return (
