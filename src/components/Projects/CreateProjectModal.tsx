@@ -63,7 +63,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ propertyId, onC
       newErrors.endDate = 'End date must be after start date';
     }
 
-    // Validate funding schedule - total must equal budget if funding details exist
+    // Validate funding schedule - total cannot exceed budget
     if (fundingDetails.length > 0) {
       const totalFunding = fundingDetails.reduce((sum, detail) => {
         const amount = parseFloat(detail.amount);
@@ -71,8 +71,8 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ propertyId, onC
       }, 0);
       const budget = parseFloat(formData.budget);
       
-      if (Math.abs(totalFunding - budget) > 0.01) { // Allow for small floating point differences
-        newErrors.fundingTotal = `Total funding ($${totalFunding.toLocaleString()}) must equal project budget ($${budget.toLocaleString()})`;
+      if (totalFunding > budget) {
+        newErrors.fundingTotal = `Total funding ($${totalFunding.toLocaleString()}) cannot exceed project budget ($${budget.toLocaleString()})`;
       }
     }
     
@@ -484,6 +484,42 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ propertyId, onC
 
             {fundingDetails.length === 0 && (
               <p className="text-gray-600 text-sm">Add funding payments to schedule project budget disbursement.</p>
+            )}
+
+            {/* Budget Summary */}
+            {fundingDetails.length > 0 && formData.budget && (
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <h4 className="font-medium text-blue-900 mb-2">Budget Summary</h4>
+                <div className="grid grid-cols-3 gap-4 text-sm">
+                  <div>
+                    <span className="text-blue-700">Total Budget:</span>
+                    <div className="font-semibold text-blue-900">
+                      ${parseFloat(formData.budget || '0').toLocaleString()}
+                    </div>
+                  </div>
+                  <div>
+                    <span className="text-blue-700">Allocated:</span>
+                    <div className="font-semibold text-blue-900">
+                      ${fundingDetails.reduce((sum, detail) => {
+                        const amount = parseFloat(detail.amount);
+                        return sum + (isNaN(amount) ? 0 : amount);
+                      }, 0).toLocaleString()}
+                    </div>
+                  </div>
+                  <div>
+                    <span className="text-blue-700">Remaining:</span>
+                    <div className="font-semibold text-blue-900">
+                      ${Math.max(0, parseFloat(formData.budget || '0') - fundingDetails.reduce((sum, detail) => {
+                        const amount = parseFloat(detail.amount);
+                        return sum + (isNaN(amount) ? 0 : amount);
+                      }, 0)).toLocaleString()}
+                    </div>
+                  </div>
+                </div>
+                <p className="text-blue-600 text-xs mt-2">
+                  You can add more funding payments later. The total allocated cannot exceed the project budget.
+                </p>
+              </div>
             )}
 
             {fundingDetails.map((detail, index) => (

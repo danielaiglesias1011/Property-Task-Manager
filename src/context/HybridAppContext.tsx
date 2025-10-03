@@ -352,6 +352,33 @@ export const HybridAppProvider: React.FC<{ children: ReactNode }> = ({ children 
       const tasks = tasksData?.map(convertRowToTask) || [];
       dispatch({ type: 'SET_TASKS', payload: tasks });
 
+      // Load project categories
+      const { data: categoriesData, error: categoriesError } = await supabase
+        .from('project_categories')
+        .select('*');
+      
+      if (categoriesError) {
+        console.warn('Could not load project categories:', categoriesError);
+        // Set default categories if database doesn't have them
+        const defaultCategories = [
+          { id: '1', name: 'Security Systems', description: 'Security and surveillance projects', isDefault: true, createdAt: new Date() },
+          { id: '2', name: 'Renovation & Upgrades', description: 'Building renovation and upgrade projects', isDefault: true, createdAt: new Date() },
+          { id: '3', name: 'Maintenance', description: 'Regular maintenance and repair projects', isDefault: true, createdAt: new Date() },
+          { id: '4', name: 'New Construction', description: 'New building and construction projects', isDefault: true, createdAt: new Date() },
+          { id: '5', name: 'Technology', description: 'IT and technology infrastructure projects', isDefault: true, createdAt: new Date() }
+        ];
+        dispatch({ type: 'SET_PROJECT_CATEGORIES', payload: defaultCategories });
+      } else {
+        const categories = categoriesData?.map((row: any) => ({
+          id: row.id || '',
+          name: row.name || '',
+          description: row.description || '',
+          isDefault: row.is_default || false,
+          createdAt: row.created_at ? new Date(row.created_at) : new Date()
+        })) || [];
+        dispatch({ type: 'SET_PROJECT_CATEGORIES', payload: categories });
+      }
+
       // Set default user if we have users and no current user
       if (users.length > 0 && !state.currentUser) {
         dispatch({ type: 'SET_CURRENT_USER', payload: users[0] });
