@@ -85,6 +85,7 @@ export interface Project {
   approvalType: 'single' | 'group';
   approvalLevel: 1 | 2 | 3;
   assignedApproverId?: string;
+  assignedApprovalGroupId?: string;
   createdBy: string;
   createdAt: Date;
   updatedAt: Date;

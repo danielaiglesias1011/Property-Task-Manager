@@ -145,6 +145,7 @@ const convertRowToProject = (row: any): Project => ({
   approvalType: row.approval_type || 'single',
   approvalLevel: row.approval_level || 1,
   assignedApproverId: row.assigned_approver_id || undefined,
+  assignedApprovalGroupId: row.assigned_approval_group_id || undefined,
   createdBy: row.created_by || '',
   createdAt: row.created_at ? new Date(row.created_at) : new Date(),
   updatedAt: row.updated_at ? new Date(row.updated_at) : new Date(),
@@ -416,6 +417,7 @@ export const HybridAppProvider: React.FC<{ children: ReactNode }> = ({ children 
           approval_type: project.approvalType,
           approval_level: project.approvalLevel,
           assigned_approver_id: project.assignedApproverId,
+          assigned_approval_group_id: project.assignedApprovalGroupId,
           created_by: project.createdBy
         }])
         .select()
@@ -447,6 +449,7 @@ export const HybridAppProvider: React.FC<{ children: ReactNode }> = ({ children 
           approval_type: project.approvalType,
           approval_level: project.approvalLevel,
           assigned_approver_id: project.assignedApproverId,
+          assigned_approval_group_id: project.assignedApprovalGroupId,
           updated_at: new Date().toISOString()
         })
         .eq('id', project.id);

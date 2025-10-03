@@ -113,7 +113,8 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ propertyId, onC
       status: formData.status,
       priority: formData.priority,
       approvalType: formData.approvalType,
-      assignedApproverId: formData.approverId,
+      assignedApproverId: formData.approvalType === 'single' ? formData.approverId : undefined,
+      assignedApprovalGroupId: formData.approvalType === 'group' ? formData.approverId : undefined,
       approvalLevel: formData.approvalType === 'single' ? 1 : 2, // Default level based on type
       createdBy: state.currentUser?.id || '1',
       createdAt: new Date(),
@@ -454,11 +455,11 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ propertyId, onC
                       </option>
                     ))
                   ) : (
-                    <>
-                      <option value="level1">Level 1 Group</option>
-                      <option value="level2">Level 2 Group</option>
-                      <option value="level3">Level 3 Group</option>
-                    </>
+                    state.approvalGroups.map(group => (
+                      <option key={group.id} value={group.id}>
+                        {group.name}
+                      </option>
+                    ))
                   )}
                 </select>
                 {errors.approverId && <p className="text-red-500 text-sm mt-1">{errors.approverId}</p>}
