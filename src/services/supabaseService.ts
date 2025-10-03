@@ -51,20 +51,22 @@ const convertRowToProject = (row: any): Project => ({
   tasks: [] // Will be loaded separately
 });
 
-const convertRowToTask = (row: any): Task => ({
-  id: row.id,
-  name: row.name,
-  description: row.description,
-  startDate: new Date(row.start_date),
-  endDate: new Date(row.end_date),
-  assigneeId: row.assignee_id || null,
-  propertyId: row.property_id || null,
-  projectId: row.project_id || null,
-  status: row.status,
-  priority: row.priority,
-  createdAt: new Date(row.created_at),
-  updatedAt: new Date(row.updated_at)
-});
+const convertRowToTask = (row: any): Task => {
+  return {
+    id: row.id,
+    name: row.name,
+    description: row.description,
+    startDate: new Date(row.start_date),
+    endDate: new Date(row.end_date),
+    assigneeId: row.assignee_id || null,
+    propertyId: row.property_id || null,
+    projectId: row.project_id || null,
+    status: row.status,
+    priority: row.priority,
+    createdAt: new Date(row.created_at),
+    updatedAt: new Date(row.updated_at)
+  };
+};
 
 const convertRowToFundingDetail = (row: any): FundingDetail => ({
   id: row.id,
@@ -338,21 +340,31 @@ export const projectService = {
 // Task operations
 export const taskService = {
   async getAll(): Promise<Task[]> {
-    const { data, error } = await supabase.from('tasks').select('*');
-    if (error) {
-      console.warn('Tasks table might not exist or be empty:', error.message);
-      return []; // Return empty array if tasks table doesn't exist
+    try {
+      const { data, error } = await supabase.from('tasks').select('*');
+      if (error) {
+        console.warn('Tasks table might not exist or be empty:', error.message);
+        return []; // Return empty array if tasks table doesn't exist
+      }
+      return data?.map(convertRowToTask) || [];
+    } catch (error) {
+      console.warn('Error fetching tasks:', error);
+      return [];
     }
-    return data?.map(convertRowToTask) || [];
   },
 
   async getByProjectId(projectId: string): Promise<Task[]> {
-    const { data, error } = await supabase.from('tasks').select('*').eq('project_id', projectId);
-    if (error) {
-      console.warn('Tasks table might not exist or be empty:', error.message);
-      return []; // Return empty array if tasks table doesn't exist
+    try {
+      const { data, error } = await supabase.from('tasks').select('*').eq('project_id', projectId);
+      if (error) {
+        console.warn('Tasks table might not exist or be empty:', error.message);
+        return []; // Return empty array if tasks table doesn't exist
+      }
+      return data?.map(convertRowToTask) || [];
+    } catch (error) {
+      console.warn('Error fetching tasks for project:', error);
+      return [];
     }
-    return data?.map(convertRowToTask) || [];
   },
 
   async create(task: Task): Promise<Task> {
