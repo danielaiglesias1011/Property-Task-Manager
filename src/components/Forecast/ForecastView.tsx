@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useApp } from '../../context/AppContext';
-import { TrendingUp, DollarSign, CheckCircle, Calendar, Folder, User, CheckSquare, RotateCcw } from 'lucide-react';
+import { TrendingUp, DollarSign, CheckCircle, Calendar, Folder, User, CheckSquare, RotateCcw, AlertCircle } from 'lucide-react';
 import { format } from 'date-fns';
 import { FundingDetail, Project } from '../../types';
 
@@ -16,24 +16,42 @@ const ForecastView: React.FC = () => {
       propertyId: string;
     }> = [];
 
+    // Safety check for state data
+    if (!state.projects || !state.properties) {
+      return [];
+    }
+
     state.projects.forEach(project => {
+      if (!project || !project.fundingDetails) return;
+      
       const property = state.properties.find(p => p.id === project.propertyId);
       if (property) {
         project.fundingDetails.forEach(funding => {
-          allFunding.push({
-            ...funding,
-            project,
-            propertyName: property.name,
-            propertyId: property.id
-          });
+          if (!funding || !funding.date) return;
+          
+          try {
+            allFunding.push({
+              ...funding,
+              project,
+              propertyName: property.name,
+              propertyId: property.id
+            });
+          } catch (error) {
+            console.error('Error processing funding detail:', error);
+          }
         });
       }
     });
 
     // Filter by selected month
     const filtered = allFunding.filter(funding => {
-      const fundingMonth = format(funding.date, 'yyyy-MM');
-      return fundingMonth === selectedMonth;
+      try {
+        const fundingMonth = format(funding.date, 'yyyy-MM');
+        return fundingMonth === selectedMonth;
+      } catch (error) {
+        console.error('Error formatting date:', error);
+        return false;
+      }
     });
 
     return filtered;
@@ -84,16 +102,32 @@ const ForecastView: React.FC = () => {
     return grouped;
   }, [fundingData]);
 
+  // Add error boundary and null checks after all hooks
+  if (!state) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600 dark:text-gray-300">Loading forecast data...</p>
+        </div>
+      </div>
+    );
+  }
+
   const handleMarkPaid = (projectId: string, fundingId: string) => {
-    dispatch({
-      type: 'UPDATE_PAYMENT_STATUS',
-      payload: {
-        projectId,
-        fundingId,
-        paymentStatus: 'paid',
-        paidBy: state.currentUser?.id || '1'
-      }
-    });
+    try {
+      dispatch({
+        type: 'UPDATE_PAYMENT_STATUS',
+        payload: {
+          projectId,
+          fundingId,
+          paymentStatus: 'paid',
+          paidBy: state.currentUser?.id || '1'
+        }
+      });
+    } catch (error) {
+      console.error('Error updating payment status:', error);
+    }
   };
 
   const getPriorityColor = (priority: string) => {
@@ -150,8 +184,9 @@ const ForecastView: React.FC = () => {
     }
   };
 
-  return (
-    <div className="space-y-6">
+  try {
+    return (
+      <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-3">
@@ -387,8 +422,22 @@ const ForecastView: React.FC = () => {
           </p>
         </div>
       )}
-    </div>
-  );
+      </div>
+    );
+  } catch (error) {
+    console.error('Error rendering ForecastView:', error);
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center">
+          <AlertCircle className="text-red-500 mx-auto mb-4" size={48} />
+          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">Error Loading Forecast</h3>
+          <p className="text-gray-600 dark:text-gray-300">
+            There was an error loading the forecast data. Please try refreshing the page.
+          </p>
+        </div>
+      </div>
+    );
+  }
 };
 
 export default ForecastView;
