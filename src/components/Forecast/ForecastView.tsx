@@ -8,6 +8,12 @@ const ForecastView: React.FC = () => {
   const { state, dispatch } = useApp();
   const [selectedMonth, setSelectedMonth] = useState<string>('2024-10');
 
+  // Debug logging
+  console.log('ForecastView rendering...');
+  console.log('State:', state);
+  console.log('State projects:', state?.projects);
+  console.log('State properties:', state?.properties);
+
   // Aggregate all funding details with project and property info
   const fundingData = useMemo(() => {
     const allFunding: Array<FundingDetail & { 
