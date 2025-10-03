@@ -53,18 +53,18 @@ const convertRowToProject = (row: any): Project => ({
 
 const convertRowToTask = (row: any): Task => {
   return {
-    id: row.id,
-    name: row.name,
-    description: row.description,
-    startDate: new Date(row.start_date),
-    endDate: new Date(row.end_date),
+    id: row.id || '',
+    name: row.name || '',
+    description: row.description || '',
+    startDate: row.start_date ? new Date(row.start_date) : new Date(),
+    endDate: row.end_date ? new Date(row.end_date) : new Date(),
     assigneeId: row.assignee_id || null,
     propertyId: row.property_id || null,
     projectId: row.project_id || null,
-    status: row.status,
-    priority: row.priority,
-    createdAt: new Date(row.created_at),
-    updatedAt: new Date(row.updated_at)
+    status: row.status || 'pending',
+    priority: row.priority || 'medium',
+    createdAt: row.created_at ? new Date(row.created_at) : new Date(),
+    updatedAt: row.updated_at ? new Date(row.updated_at) : new Date()
   };
 };
 
