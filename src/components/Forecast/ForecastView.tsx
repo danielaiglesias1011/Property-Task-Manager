@@ -8,60 +8,46 @@ const ForecastView: React.FC = () => {
   const { state, dispatch } = useApp();
   const [selectedMonth, setSelectedMonth] = useState<string>('2024-10');
 
-  // Debug logging
-  console.log('ForecastView rendering...');
-  console.log('State:', state);
-  console.log('State projects:', state?.projects);
-  console.log('State properties:', state?.properties);
-
   // Aggregate all funding details with project and property info
   const fundingData = useMemo(() => {
+    if (!state?.projects || !state?.properties) {
+      return [];
+    }
+
     const allFunding: Array<FundingDetail & { 
       project: Project; 
       propertyName: string; 
       propertyId: string;
     }> = [];
 
-    // Safety check for state data
-    if (!state.projects || !state.properties) {
-      return [];
-    }
-
     state.projects.forEach(project => {
-      if (!project || !project.fundingDetails) return;
-      
-      const property = state.properties.find(p => p.id === project.propertyId);
-      if (property) {
-        project.fundingDetails.forEach(funding => {
-          if (!funding || !funding.date) return;
-          
-          try {
-            allFunding.push({
-              ...funding,
-              project,
-              propertyName: property.name,
-              propertyId: property.id
-            });
-          } catch (error) {
-            console.error('Error processing funding detail:', error);
-          }
-        });
+      if (project?.fundingDetails) {
+        const property = state.properties.find(p => p.id === project.propertyId);
+        if (property) {
+          project.fundingDetails.forEach(funding => {
+            if (funding?.date) {
+              allFunding.push({
+                ...funding,
+                project,
+                propertyName: property.name,
+                propertyId: property.id
+              });
+            }
+          });
+        }
       }
     });
 
     // Filter by selected month
-    const filtered = allFunding.filter(funding => {
+    return allFunding.filter(funding => {
       try {
         const fundingMonth = format(funding.date, 'yyyy-MM');
         return fundingMonth === selectedMonth;
-      } catch (error) {
-        console.error('Error formatting date:', error);
+      } catch {
         return false;
       }
     });
-
-    return filtered;
-  }, [state.projects, state.properties, selectedMonth]);
+  }, [state?.projects, state?.properties, selectedMonth]);
 
   // Calculate summary statistics
   const summary = useMemo(() => {
@@ -75,13 +61,15 @@ const ForecastView: React.FC = () => {
     };
 
     fundingData.forEach(funding => {
-      totals.totalPaymentsDue += funding.amount;
-      totals.total += funding.amount;
-      
-      if (funding.paymentStatus === 'paid') {
-        totals.paid += funding.amount;
-      } else {
-        totals.unpaid += funding.amount;
+      if (funding?.amount) {
+        totals.totalPaymentsDue += funding.amount;
+        totals.total += funding.amount;
+        
+        if (funding.paymentStatus === 'paid') {
+          totals.paid += funding.amount;
+        } else {
+          totals.unpaid += funding.amount;
+        }
       }
     });
 
@@ -96,44 +84,30 @@ const ForecastView: React.FC = () => {
     } } = {};
 
     fundingData.forEach(funding => {
-      if (!grouped[funding.propertyId]) {
-        grouped[funding.propertyId] = {
-          propertyName: funding.propertyName,
-          items: []
-        };
+      if (funding?.propertyId && funding?.propertyName) {
+        if (!grouped[funding.propertyId]) {
+          grouped[funding.propertyId] = {
+            propertyName: funding.propertyName,
+            items: []
+          };
+        }
+        grouped[funding.propertyId].items.push(funding);
       }
-      grouped[funding.propertyId].items.push(funding);
     });
 
     return grouped;
   }, [fundingData]);
 
-  // Add error boundary and null checks after all hooks
-  if (!state) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-300">Loading forecast data...</p>
-        </div>
-      </div>
-    );
-  }
-
   const handleMarkPaid = (projectId: string, fundingId: string) => {
-    try {
-      dispatch({
-        type: 'UPDATE_PAYMENT_STATUS',
-        payload: {
-          projectId,
-          fundingId,
-          paymentStatus: 'paid',
-          paidBy: state.currentUser?.id || '1'
-        }
-      });
-    } catch (error) {
-      console.error('Error updating payment status:', error);
-    }
+    dispatch({
+      type: 'UPDATE_PAYMENT_STATUS',
+      payload: {
+        projectId,
+        fundingId,
+        paymentStatus: 'paid',
+        paidBy: state?.currentUser?.id || '1'
+      }
+    });
   };
 
   const getPriorityColor = (priority: string) => {
@@ -190,9 +164,8 @@ const ForecastView: React.FC = () => {
     }
   };
 
-  try {
-    return (
-      <div className="space-y-6">
+  return (
+    <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-3">
@@ -428,22 +401,8 @@ const ForecastView: React.FC = () => {
           </p>
         </div>
       )}
-      </div>
-    );
-  } catch (error) {
-    console.error('Error rendering ForecastView:', error);
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-center">
-          <AlertCircle className="text-red-500 mx-auto mb-4" size={48} />
-          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">Error Loading Forecast</h3>
-          <p className="text-gray-600 dark:text-gray-300">
-            There was an error loading the forecast data. Please try refreshing the page.
-          </p>
-        </div>
-      </div>
-    );
-  }
+    </div>
+  );
 };
 
 export default ForecastView;
