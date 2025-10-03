@@ -4,7 +4,6 @@ import { CheckSquare, Plus, Filter, ChevronDown, ChevronRight } from 'lucide-rea
 import TaskCard from '../components/Tasks/TaskCard';
 import CreateTaskModal from '../components/Tasks/CreateTaskModal';
 import { useModal } from '../hooks/useModal';
-import ConfirmModal from '../components/Common/ConfirmModal';
 
 const Tasks: React.FC = () => {
   const { state, dispatch } = useApp();
@@ -339,8 +338,6 @@ const Tasks: React.FC = () => {
         />
       )}
 
-      {/* Confirm Modal */}
-      <ConfirmModal />
     </div>
   );
 };
