@@ -58,11 +58,13 @@ const convertRowToTask = (row: any): Task => {
     description: row.description || '',
     startDate: row.start_date ? new Date(row.start_date) : new Date(),
     endDate: row.end_date ? new Date(row.end_date) : new Date(),
-    assigneeId: row.assignee_id || null,
-    propertyId: row.property_id || null,
-    projectId: row.project_id || null,
+    assigneeId: row.assignee_id || '',
+    propertyId: row.property_id || '',
+    projectId: row.project_id || undefined,
     status: row.status || 'pending',
     priority: row.priority || 'medium',
+    comments: [],
+    attachments: [],
     createdAt: row.created_at ? new Date(row.created_at) : new Date(),
     updatedAt: row.updated_at ? new Date(row.updated_at) : new Date()
   };
