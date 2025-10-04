@@ -84,7 +84,14 @@ const Tasks: React.FC = () => {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
+        <div 
+          className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 cursor-pointer hover:shadow-md hover:border-blue-300 dark:hover:border-blue-600 transition-all"
+          onClick={() => {
+            setFilterStatus('');
+            setFilterProperty('');
+            setFilterAssignee('');
+          }}
+        >
           <div className="flex items-center space-x-3">
             <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center">
               <CheckSquare className="text-blue-600 dark:text-blue-400" size={16} />
@@ -96,7 +103,10 @@ const Tasks: React.FC = () => {
           </div>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
+        <div 
+          className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 cursor-pointer hover:shadow-md hover:border-gray-400 dark:hover:border-gray-500 transition-all"
+          onClick={() => setFilterStatus('pending')}
+        >
           <div className="flex items-center space-x-3">
             <div className="w-8 h-8 bg-gray-100 dark:bg-gray-600 rounded-lg flex items-center justify-center">
               <CheckSquare className="text-gray-600 dark:text-gray-400" size={16} />
@@ -108,7 +118,10 @@ const Tasks: React.FC = () => {
           </div>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
+        <div 
+          className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 cursor-pointer hover:shadow-md hover:border-yellow-400 dark:hover:border-yellow-500 transition-all"
+          onClick={() => setFilterStatus('in-progress')}
+        >
           <div className="flex items-center space-x-3">
             <div className="w-8 h-8 bg-yellow-100 dark:bg-yellow-900 rounded-lg flex items-center justify-center">
               <CheckSquare className="text-yellow-600 dark:text-yellow-400" size={16} />
@@ -120,7 +133,10 @@ const Tasks: React.FC = () => {
           </div>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
+        <div 
+          className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 cursor-pointer hover:shadow-md hover:border-green-400 dark:hover:border-green-500 transition-all"
+          onClick={() => setFilterStatus('completed')}
+        >
           <div className="flex items-center space-x-3">
             <div className="w-8 h-8 bg-green-100 dark:bg-green-900 rounded-lg flex items-center justify-center">
               <CheckSquare className="text-green-600 dark:text-green-400" size={16} />
@@ -132,7 +148,14 @@ const Tasks: React.FC = () => {
           </div>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
+        <div 
+          className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 cursor-pointer hover:shadow-md hover:border-red-400 dark:hover:border-red-500 transition-all"
+          onClick={() => {
+            // Filter for overdue tasks (tasks where endDate < today and status != completed)
+            setFilterStatus('');
+            // This would need custom logic for overdue filtering
+          }}
+        >
           <div className="flex items-center space-x-3">
             <div className="w-8 h-8 bg-red-100 dark:bg-red-900 rounded-lg flex items-center justify-center">
               <CheckSquare className="text-red-600 dark:text-red-400" size={16} />
@@ -239,7 +262,15 @@ const Tasks: React.FC = () => {
                           <CheckSquare className="text-blue-600 dark:text-blue-400" size={16} />
                         </div>
                         <div className="text-left">
-                          <h3 className="font-semibold text-gray-800 dark:text-white">{property.name}</h3>
+                          <h3 
+                            className="font-semibold text-gray-800 dark:text-white cursor-pointer hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setFilterProperty(property.id);
+                            }}
+                          >
+                            {property.name}
+                          </h3>
                           <p className="text-sm text-gray-600 dark:text-gray-300">{tasks.length} tasks</p>
                         </div>
                       </div>
@@ -286,9 +317,26 @@ const Tasks: React.FC = () => {
                           <CheckSquare className="text-purple-600" size={16} />
                         </div>
                         <div className="text-left">
-                          <h3 className="font-semibold text-gray-800">{project.name}</h3>
+                          <h3 
+                            className="font-semibold text-gray-800 cursor-pointer hover:text-purple-600 transition-colors"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              // TODO: Navigate to project detail or filter by project
+                            }}
+                          >
+                            {project.name}
+                          </h3>
                           <p className="text-sm text-gray-600">
-                            {property?.name} • {projectTasks.length} tasks
+                            <span 
+                              className="cursor-pointer hover:text-blue-600 transition-colors"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setFilterProperty(project.propertyId);
+                              }}
+                            >
+                              {property?.name}
+                            </span>
+                            {' • '}{projectTasks.length} tasks
                           </p>
                         </div>
                       </div>

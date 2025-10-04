@@ -150,7 +150,10 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-shadow">
+    <div 
+      className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-shadow cursor-pointer"
+      onClick={() => onView && onView(project)}
+    >
       <div className="flex items-start justify-between mb-4">
         <div className="flex-1">
           <div className="flex items-center space-x-2 mb-2">
@@ -173,14 +176,20 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
         {/* Actions Menu */}
         <div className="relative ml-4">
           <button
-            onClick={() => setShowActions(!showActions)}
+            onClick={(e) => {
+              e.stopPropagation();
+              setShowActions(!showActions);
+            }}
             className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
           >
             <MoreVertical size={16} />
           </button>
 
           {showActions && (
-            <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-10">
+            <div 
+              className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-10"
+              onClick={(e) => e.stopPropagation()}
+            >
               <div className="py-1">
                 {onView && (
                   <button

@@ -77,3 +77,4 @@ UNION ALL
 SELECT 'Attachment Types', COUNT(*) FROM attachment_types WHERE is_default = true
 UNION ALL
 SELECT 'Approval Groups', COUNT(*) FROM approval_groups WHERE level IN (1, 2, 3);
+

@@ -121,3 +121,4 @@ CREATE SCHEMA public;
 ```
 
 Then re-run the schema and seed data scripts.
+

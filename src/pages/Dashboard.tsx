@@ -10,9 +10,11 @@ import {
 } from 'lucide-react';
 import { format, isAfter, isBefore } from 'date-fns';
 import SupabaseTest from '../components/Test/SupabaseTest';
+import { useNavigate } from 'react-router-dom';
 
 const Dashboard: React.FC = () => {
   const { state } = useApp();
+  const navigate = useNavigate();
 
   // Calculate dashboard statistics
   const stats = {
@@ -58,7 +60,10 @@ const Dashboard: React.FC = () => {
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+        <div 
+          className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 cursor-pointer hover:shadow-md hover:border-blue-300 dark:hover:border-blue-600 transition-all"
+          onClick={() => navigate('/properties')}
+        >
           <div className="flex items-center">
             <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center">
               <Building2 className="text-blue-600 dark:text-blue-400" size={24} />
@@ -70,7 +75,10 @@ const Dashboard: React.FC = () => {
           </div>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+        <div 
+          className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 cursor-pointer hover:shadow-md hover:border-green-300 dark:hover:border-green-600 transition-all"
+          onClick={() => navigate('/projects')}
+        >
           <div className="flex items-center">
             <div className="w-12 h-12 bg-green-100 dark:bg-green-900 rounded-lg flex items-center justify-center">
               <FolderOpen className="text-green-600 dark:text-green-400" size={24} />
@@ -82,7 +90,10 @@ const Dashboard: React.FC = () => {
           </div>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+        <div 
+          className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 cursor-pointer hover:shadow-md hover:border-purple-300 dark:hover:border-purple-600 transition-all"
+          onClick={() => navigate('/tasks')}
+        >
           <div className="flex items-center">
             <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900 rounded-lg flex items-center justify-center">
               <CheckSquare className="text-purple-600 dark:text-purple-400" size={24} />
@@ -94,7 +105,10 @@ const Dashboard: React.FC = () => {
           </div>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+        <div 
+          className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 cursor-pointer hover:shadow-md hover:border-yellow-300 dark:hover:border-yellow-600 transition-all"
+          onClick={() => navigate('/forecast')}
+        >
           <div className="flex items-center">
             <div className="w-12 h-12 bg-yellow-100 dark:bg-yellow-900 rounded-lg flex items-center justify-center">
               <TrendingUp className="text-yellow-600 dark:text-yellow-400" size={24} />
@@ -113,7 +127,10 @@ const Dashboard: React.FC = () => {
       {(stats.pendingApprovals > 0 || stats.overdueTasks > 0) && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {stats.pendingApprovals > 0 && (
-            <div className="bg-yellow-50 dark:bg-yellow-900 border border-yellow-200 dark:border-yellow-700 rounded-lg p-4">
+            <div 
+              className="bg-yellow-50 dark:bg-yellow-900 border border-yellow-200 dark:border-yellow-700 rounded-lg p-4 cursor-pointer hover:bg-yellow-100 dark:hover:bg-yellow-800 transition-colors"
+              onClick={() => navigate('/projects')}
+            >
               <div className="flex items-center">
                 <Clock className="text-yellow-600" size={20} />
                 <div className="ml-3">
@@ -129,7 +146,10 @@ const Dashboard: React.FC = () => {
           )}
 
           {stats.overdueTasks > 0 && (
-            <div className="bg-red-50 dark:bg-red-900 border border-red-200 dark:border-red-700 rounded-lg p-4">
+            <div 
+              className="bg-red-50 dark:bg-red-900 border border-red-200 dark:border-red-700 rounded-lg p-4 cursor-pointer hover:bg-red-100 dark:hover:bg-red-800 transition-colors"
+              onClick={() => navigate('/tasks')}
+            >
               <div className="flex items-center">
                 <AlertCircle className="text-red-600" size={20} />
                 <div className="ml-3">

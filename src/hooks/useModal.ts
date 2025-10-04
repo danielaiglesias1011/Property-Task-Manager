@@ -98,3 +98,4 @@ export const useModal = () => {
     handleConfirm
   };
 };
+

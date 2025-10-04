@@ -61,3 +61,4 @@ try {
 }
 
 console.log('\n📖 For detailed instructions, see database/README.md');
+

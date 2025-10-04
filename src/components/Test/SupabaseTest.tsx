@@ -73,3 +73,4 @@ const SupabaseTest: React.FC = () => {
 };
 
 export default SupabaseTest;
+

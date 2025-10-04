@@ -179,3 +179,4 @@ CREATE TRIGGER update_properties_updated_at BEFORE UPDATE ON properties FOR EACH
 CREATE TRIGGER update_projects_updated_at BEFORE UPDATE ON projects FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE TRIGGER update_tasks_updated_at BEFORE UPDATE ON tasks FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE TRIGGER update_approval_groups_updated_at BEFORE UPDATE ON approval_groups FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+

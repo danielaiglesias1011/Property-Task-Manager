@@ -85,3 +85,4 @@ INSERT INTO tasks (id, name, description, start_date, end_date, assignee_id, pro
 INSERT INTO approval_history (project_id, approver_id, action, comments, created_at) VALUES
 ('1', '1', 'approved', 'Project approved for implementation', '2024-09-29'),
 ('2', '1', 'approved', 'Project approved for planning phase', '2024-09-29');
+

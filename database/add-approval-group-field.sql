@@ -19,3 +19,4 @@ CHECK (
   (approval_type = 'single' AND assigned_approver_id IS NOT NULL AND assigned_approval_group_id IS NULL) OR
   (approval_type = 'group' AND assigned_approval_group_id IS NOT NULL AND assigned_approver_id IS NULL)
 );
+

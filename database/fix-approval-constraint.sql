@@ -15,3 +15,4 @@ CHECK (
   -- Draft projects: both can be NULL (for initial creation)
   (assigned_approver_id IS NULL AND assigned_approval_group_id IS NULL)
 );
+

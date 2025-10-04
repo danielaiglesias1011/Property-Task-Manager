@@ -2,11 +2,16 @@ import React, { useState } from 'react';
 import { useApp } from '../context/HybridAppContext';
 import { FolderOpen, Plus, Filter } from 'lucide-react';
 import ProjectCard from '../components/Projects/ProjectCard';
+import ProjectDetail from '../components/Projects/ProjectDetail';
 import CreateProjectModal from '../components/Projects/CreateProjectModal';
+import { Project } from '../types';
+import { useModal } from '../hooks/useModal';
 
 const Projects: React.FC = () => {
-  const { state } = useApp();
+  const { state, dispatch } = useApp();
+  const { showConfirm } = useModal();
   const [showCreateProject, setShowCreateProject] = useState(false);
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [filterProperty, setFilterProperty] = useState<string>('');
   const [filterStatus, setFilterStatus] = useState<string>('');
 
@@ -16,6 +21,27 @@ const Projects: React.FC = () => {
     if (filterStatus && project.status !== filterStatus) return false;
     return true;
   });
+
+  // Handle project actions
+  const handleDeleteProject = (project: Project) => {
+    showConfirm(
+      'Delete Project',
+      `Are you sure you want to delete the project "${project.name}"? This action cannot be undone.`,
+      () => {
+        dispatch({ type: 'DELETE_PROJECT', payload: project.id });
+      },
+      {
+        confirmText: 'Delete',
+        cancelText: 'Cancel',
+        type: 'danger'
+      }
+    );
+  };
+
+  const handleEditProject = (project: Project) => {
+    // TODO: Implement edit functionality
+    console.log('Edit project:', project);
+  };
 
   // Project statistics
   const stats = {
@@ -27,6 +53,18 @@ const Projects: React.FC = () => {
     completed: state.projects.filter(p => p.status === 'completed').length,
     rejected: state.projects.filter(p => p.status === 'rejected').length
   };
+
+  // Show project detail if selected
+  if (selectedProject) {
+    return (
+      <ProjectDetail
+        project={selectedProject}
+        onBack={() => setSelectedProject(null)}
+        onEdit={handleEditProject}
+        onDelete={handleDeleteProject}
+      />
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -53,7 +91,10 @@ const Projects: React.FC = () => {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-7 gap-4">
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
+        <div 
+          className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 cursor-pointer hover:shadow-md hover:border-blue-300 dark:hover:border-blue-600 transition-all"
+          onClick={() => setFilterStatus('')}
+        >
           <div className="flex items-center space-x-3">
             <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center">
               <FolderOpen className="text-blue-600 dark:text-blue-400" size={16} />
@@ -65,7 +106,10 @@ const Projects: React.FC = () => {
           </div>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
+        <div 
+          className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 cursor-pointer hover:shadow-md hover:border-gray-400 dark:hover:border-gray-500 transition-all"
+          onClick={() => setFilterStatus('draft')}
+        >
           <div className="flex items-center space-x-3">
             <div className="w-8 h-8 bg-gray-100 dark:bg-gray-600 rounded-lg flex items-center justify-center">
               <FolderOpen className="text-gray-600 dark:text-gray-400" size={16} />
@@ -77,7 +121,10 @@ const Projects: React.FC = () => {
           </div>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
+        <div 
+          className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 cursor-pointer hover:shadow-md hover:border-yellow-400 dark:hover:border-yellow-500 transition-all"
+          onClick={() => setFilterStatus('pending-approval')}
+        >
           <div className="flex items-center space-x-3">
             <div className="w-8 h-8 bg-yellow-100 dark:bg-yellow-900 rounded-lg flex items-center justify-center">
               <FolderOpen className="text-yellow-600 dark:text-yellow-400" size={16} />
@@ -89,7 +136,10 @@ const Projects: React.FC = () => {
           </div>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
+        <div 
+          className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 cursor-pointer hover:shadow-md hover:border-green-400 dark:hover:border-green-500 transition-all"
+          onClick={() => setFilterStatus('approved')}
+        >
           <div className="flex items-center space-x-3">
             <div className="w-8 h-8 bg-green-100 dark:bg-green-900 rounded-lg flex items-center justify-center">
               <FolderOpen className="text-green-600 dark:text-green-400" size={16} />
@@ -101,7 +151,10 @@ const Projects: React.FC = () => {
           </div>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
+        <div 
+          className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 cursor-pointer hover:shadow-md hover:border-purple-400 dark:hover:border-purple-500 transition-all"
+          onClick={() => setFilterStatus('in-progress')}
+        >
           <div className="flex items-center space-x-3">
             <div className="w-8 h-8 bg-purple-100 dark:bg-purple-900 rounded-lg flex items-center justify-center">
               <FolderOpen className="text-purple-600 dark:text-purple-400" size={16} />
@@ -113,7 +166,10 @@ const Projects: React.FC = () => {
           </div>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
+        <div 
+          className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 cursor-pointer hover:shadow-md hover:border-emerald-400 dark:hover:border-emerald-500 transition-all"
+          onClick={() => setFilterStatus('completed')}
+        >
           <div className="flex items-center space-x-3">
             <div className="w-8 h-8 bg-emerald-100 dark:bg-emerald-900 rounded-lg flex items-center justify-center">
               <FolderOpen className="text-emerald-600 dark:text-emerald-400" size={16} />
@@ -125,7 +181,10 @@ const Projects: React.FC = () => {
           </div>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
+        <div 
+          className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 cursor-pointer hover:shadow-md hover:border-red-400 dark:hover:border-red-500 transition-all"
+          onClick={() => setFilterStatus('rejected')}
+        >
           <div className="flex items-center space-x-3">
             <div className="w-8 h-8 bg-red-100 dark:bg-red-900 rounded-lg flex items-center justify-center">
               <FolderOpen className="text-red-600 dark:text-red-400" size={16} />
@@ -203,7 +262,10 @@ const Projects: React.FC = () => {
                 
                 return (
                   <div key={property.id} className="mb-8">
-                    <h2 className="text-xl font-semibold text-gray-800 mb-4">
+                    <h2 
+                      className="text-xl font-semibold text-gray-800 mb-4 cursor-pointer hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                      onClick={() => setFilterProperty(property.id)}
+                    >
                       {property.name}
                       <span className="text-sm text-gray-500 ml-2">
                         ({propertyProjects.length} projects)
@@ -211,7 +273,13 @@ const Projects: React.FC = () => {
                     </h2>
                     <div className="grid gap-4">
                       {propertyProjects.map(project => (
-                        <ProjectCard key={project.id} project={project} />
+                        <ProjectCard 
+                          key={project.id} 
+                          project={project} 
+                          onView={setSelectedProject}
+                          onEdit={handleEditProject}
+                          onDelete={handleDeleteProject}
+                        />
                       ))}
                     </div>
                   </div>
