@@ -302,15 +302,15 @@ const ProjectDetail: React.FC<ProjectDetailProps> = ({
                 <div>
                   <p className="font-medium text-gray-800 dark:text-white">{formatBudget(detail.amount)}</p>
                   <p className="text-sm text-gray-500 dark:text-gray-400">
-                    Due: {formatDate(detail.date)} • Paid by: {detail.paidBy}
+                    Due: {formatDate(detail.date)} • Paid by: {detail.paidBy || 'TBD'}
                   </p>
                 </div>
                 <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                  detail.status === 'paid' 
+                  detail.paymentStatus === 'paid' 
                     ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
                     : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
                 }`}>
-                  {detail.status}
+                  {detail.paymentStatus}
                 </span>
               </div>
             ))}
